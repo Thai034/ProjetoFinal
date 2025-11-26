@@ -1,0 +1,1791 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoTrace - Dashboard de Emissões COP30</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary-color: #2e7d32;
+            --primary-light: #60ad5e;
+            --primary-dark: #005005;
+            --secondary-color: #ff8f00;
+            --background-color: #f5f5f5;
+            --card-color: #ffffff;
+            --text-color: #333333;
+            --text-light: #757575;
+            --border-color: #e0e0e0;
+            --chart-text-color: #333333;
+        }
+
+        [data-theme="dark"] {
+            --primary-color: #4CAF50;
+            --primary-light: #81C784;
+            --primary-dark: #388E3C;
+            --secondary-color: #FFA000;
+            --background-color: #1a1a1a;
+            --card-color: #2d2d2d;
+            --text-color: #ffffff;
+            --text-light: #b0b0b0;
+            --border-color: #404040;
+            --chart-text-color: #ffffff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /*
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo h1 {
+            font-size: 1.6rem;
+            font-weight: 600;
+        }
+
+        .logo-icon {
+            font-size: 2rem;
+        }
+*/
+        .cop30-badge {
+            background: var(--secondary-color);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+            position: relative;
+        }
+
+        nav ul li {
+            position: relative;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: opacity 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+        }
+
+        nav a:hover {
+            opacity: 0.8;
+        }
+
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: var(--card-color);
+            min-width: 200px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            z-index: 1000;
+            list-style: none;
+            margin-top: 10px;
+            border: 1px solid var(--border-color);
+        }
+
+        .dropdown-menu.active {
+            display: block;
+        }
+
+        .dropdown-menu li {
+            width: 100%;
+        }
+
+        .dropdown-menu a {
+            color: var(--text-color) !important;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .dropdown-menu a:hover {
+            background: var(--primary-color);
+            color: white !important;
+        }
+
+        .dropdown-menu li:last-child a {
+            border-bottom: none;
+        }
+
+        .language-options {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 100%;
+            background: var(--card-color);
+            min-width: 150px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            z-index: 1001;
+            list-style: none;
+            border: 1px solid var(--border-color);
+        }
+
+        .language-options.active {
+            display: block;
+        }
+
+        .language-options li {
+            width: 100%;
+        }
+
+        .language-options a {
+            color: var(--text-color) !important;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .language-options a:hover {
+            background: var(--primary-color);
+            color: white !important;
+        }
+
+        .language-options li:last-child a {
+            border-bottom: none;
+        }
+
+        main {
+            flex: 1;
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .dashboard-title {
+            margin-bottom: 1.5rem;
+            color: var(--primary-dark);
+            border-bottom: 2px solid var(--primary-light);
+            padding-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background-color: var(--card-color);
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            padding: 1.5rem;
+            transition: transform 0.3s, box-shadow 0.3s, background-color 0.3s;
+            border: 1px solid var(--border-color);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+        }
+
+        .card h2 {
+            color: var(--primary-color);
+            margin-bottom: 1.2rem;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.5rem;
+        }
+
+        .card-icon {
+            font-size: 1.4rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--text-color);
+            font-size: 0.95rem;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 0.85rem;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s, box-shadow 0.3s;
+            background: var(--card-color);
+            color: var(--text-color);
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.1);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+            color: white;
+            border: none;
+            padding: 0.85rem 1.8rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 2px 8px rgba(46, 125, 50, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(46, 125, 50, 0.4);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, var(--secondary-color), #ff6d00);
+        }
+
+        .btn-secondary:hover {
+            box-shadow: 0 4px 12px rgba(255, 143, 0, 0.4);
+        }
+
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.2rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .kpi-card {
+            background: linear-gradient(135deg, var(--card-color), var(--background-color));
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            border-left: 5px solid var(--primary-color);
+            transition: transform 0.3s;
+        }
+
+        .kpi-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .kpi-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin: 0.8rem 0;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .kpi-label {
+            color: var(--text-light);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .chart-container {
+            height: 280px;
+            margin-bottom: 1.5rem;
+            background: var(--card-color);
+            border-radius: 8px;
+            padding: 1rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .recommendations-list {
+            list-style-type: none;
+        }
+
+        .recommendations-list li {
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            transition: background-color 0.3s;
+        }
+
+        .recommendations-list li:hover {
+            background-color: rgba(0,0,0,0.05);
+            border-radius: 6px;
+            padding: 1rem;
+            margin: 0 -0.5rem;
+        }
+
+        .recommendations-list li:last-child {
+            border-bottom: none;
+        }
+
+        .recommendation-icon {
+            color: var(--secondary-color);
+            font-size: 1.3rem;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .recommendation-content h3 {
+            font-size: 1.05rem;
+            margin-bottom: 0.3rem;
+            color: var(--primary-dark);
+        }
+
+        .recommendation-content p {
+            color: var(--text-light);
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        footer {
+            background: linear-gradient(135deg, var(--primary-dark), #003300);
+            color: white;
+            text-align: center;
+            padding: 2rem;
+            margin-top: 3rem;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 1rem;
+            color: var(--primary-color);
+        }
+
+        .scope-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+
+        .scope-direct { background: #ffebee; color: #c62828; }
+        .scope-indirect { background: #e3f2fd; color: #1565c0; }
+        .scope-other { background: #f3e5f5; color: #7b1fa2; }
+
+        .status-indicator {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        .status-online { background: #e8f5e8; color: #2e7d32; }
+        .status-offline { background: #ffebee; color: #c62828; }
+
+        /* Estilo para análise de impacto - texto sempre preto */
+        .impact-content {
+            color: #333333 !important;
+        }
+
+        .impact-content h3 {
+            color: inherit !important;
+        }
+
+        .impact-content p {
+            color: inherit !important;
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+            
+            nav ul {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 1rem;
+            }
+            
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .kpi-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .actions {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .language-options {
+                left: 0;
+                top: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .kpi-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            main {
+                padding: 1rem;
+            }
+            
+            .card {
+                padding: 1.2rem;
+            }
+            
+            .kpi-value {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <div class="logo">
+                    <a href="#" class="logo">
+                        <img src="../static/imagens/logo-clara-horizontal.png" alt="logo-horizontal">
+                    </a>
+                    <h1>EcoTrace - Dashboard COP30
+                        <span class="cop30-badge">COP30 2025</span>
+                        <span id="api-status" class="status-indicator status-offline">API Offline</span>
+                    </h1>
+                </div>
+                <nav>
+                    <ul>
+                        <li>
+                            <a href="#" id="config-toggle"><span>⚙️</span> <span id="config-text">Configurações</span></a>
+                            <ul class="dropdown-menu" id="config-menu">
+                                <li><a href="#" id="theme-toggle"><span>🎨</span> <span id="theme-text">Tema</span></a></li>
+                                <li>
+                                    <a href="#" id="language-toggle"><span>🌐</span> <span id="language-text">Idioma</span></a>
+                                    <ul class="language-options" id="language-options">
+                                        <li><a href="#" data-lang="pt">🇧🇷 Português</a></li>
+                                        <li><a href="#" data-lang="en">🇺🇸 English</a></li>
+                                        <li><a href="#" data-lang="es">🇪🇸 Español</a></li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                        <li><span id="reports-text"><span>📊</span><a href="{{url_for('relatorios')}}">Relatórios</a></span></li>
+                        <li><a href="#"><span>🔍</span> <span id="analysis-text">Análise</span></a></li>
+                    </ul>
+                </nav>
+            </div>
+        </header>
+
+        <main>
+            <h1 class="dashboard-title">
+                <span>📊</span> <span id="dashboard-title-text">Dashboard de Emissões de Carbono - Padrões COP30 2025</span>
+            </h1>
+            
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <div class="kpi-label" id="total-emissions-label">Emissões Totais</div>
+                    <div class="kpi-value" id="total-emissions">0.00 tCO₂e</div>
+                    <div class="kpi-label" id="base-cop30-label">Base COP30 2025</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label" id="direct-emissions-label">Emissões Diretas</div>
+                    <div class="kpi-value" id="direct-emissions">0.00 tCO₂e</div>
+                    <div class="kpi-label" id="scope1-label">Escopo 1 - Diretas</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label" id="indirect-emissions-label">Energia Indireta</div>
+                    <div class="kpi-value" id="indirect-emissions">0.00 tCO₂e</div>
+                    <div class="kpi-label" id="scope2-label">Escopo 2 - Indiretas</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label" id="other-emissions-label">Outras Emissões</div>
+                    <div class="kpi-value" id="other-emissions">0.00 tCO₂e</div>
+                    <div class="kpi-label" id="scope3-label">Escopo 3 - Outras</div>
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+                <div class="card">
+                    <h2><span class="card-icon">🧮</span> <span id="calculator-title">Calculadora de Emissões COP30</span></h2>
+                    <form id="emission-form">
+                        <div class="form-group">
+                            <label for="process-category" id="category-label">Categoria de Emissão</label>
+                            <select id="process-category" required>
+                                <option value="" id="select-category-option">Selecione uma categoria</option>
+                                <option value="energy" id="energy-option">Consumo de Energia</option>
+                                <option value="transport" id="transport-option">Transporte</option>
+                                <option value="materials" id="materials-option">Matérias-primas</option>
+                                <option value="waste" id="waste-option">Gestão de Resíduos</option>
+                                <option value="water" id="water-option">Consumo de Água</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group" id="subcategory-group" style="display: none;">
+                            <label for="process-subcategory" id="subcategory-label">Tipo Específico</label>
+                            <select id="process-subcategory">
+                                <!-- Preenchido dinamicamente -->
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="process-quantity" id="quantity-label">Quantidade</label>
+                            <input type="number" id="process-quantity" required 
+                                   placeholder="Ex: 1000" step="0.01" min="0">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="process-unit" id="unit-label">Unidade de Medida</label>
+                            <select id="process-unit" required>
+                                <option value="" id="select-unit-option">Selecione uma unidade</option>
+                                <!-- Preenchido dinamicamente -->
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="process-scope" id="scope-label">Escopo de Emissão</label>
+                            <select id="process-scope" required>
+                                <option value="" id="select-scope-option">Selecione um escopo</option>
+                                <option value="direct" id="scope-direct-option">Escopo 1 - Emissões Diretas</option>
+                                <option value="indirect" id="scope-indirect-option">Escopo 2 - Energia Indireta</option>
+                                <option value="other" id="scope-other-option">Escopo 3 - Outras Emissões</option>
+                            </select>
+                        </div>
+                        
+                        <div class="actions">
+                            <button type="submit" class="btn">
+                                <span>🌱</span> <span id="calculate-btn-text">Calcular Emissões COP30</span>
+                            </button>
+                            <button type="button" id="reset-btn" class="btn btn-secondary">
+                                <span>🔄</span> <span id="reset-btn-text">Resetar Dados</span>
+                            </button>
+                        </div>
+                    </form>
+
+                    <div class="loading" id="calculation-loading">
+                        <p>🔄 <span id="loading-text">Calculando emissões conforme padrões COP30...</span></p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2><span class="card-icon">📊</span> <span id="visualization-title">Visualização de Emissões</span></h2>
+                    <div class="chart-container">
+                        <canvas id="emissions-chart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="scope-chart"></canvas>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2><span class="card-icon">🔍</span> <span id="analysis-title">Análise de Impacto COP30</span></h2>
+                    <div id="impact-analysis">
+                        <p id="analysis-placeholder">Insira dados do processo para ver a análise de impacto baseada nos padrões COP30 2025.</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2><span class="card-icon">💡</span> <span id="opportunities-title">Oportunidades de Redução</span></h2>
+                    <ul class="recommendations-list" id="recommendations-list">
+                        <li>
+                            <span class="recommendation-icon">🌞</span>
+                            <div class="recommendation-content">
+                                <h3 id="energy-transition-title">Transição Energética</h3>
+                                <p id="energy-transition-desc">Migre para fontes renováveis como solar e eólica para reduzir emissões do Escopo 2.</p>
+                            </div>
+                        </li>
+                        <li>
+                            <span class="recommendation-icon">🚗</span>
+                            <div class="recommendation-content">
+                                <h3 id="mobility-title">Mobilidade Sustentável</h3>
+                                <p id="mobility-desc">Adote veículos elétricos e otimize rotas para reduzir emissões de transporte.</p>
+                            </div>
+                        </li>
+                        <li>
+                            <span class="recommendation-icon">♻️</span>
+                            <div class="recommendation-content">
+                                <h3 id="economy-title">Economia Circular</h3>
+                                <p id="economy-desc">Implemente práticas de reutilização e reciclagem para reduzir emissões de materiais.</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <p id="footer-text">EcoTrace - Sistema de Gestão de Emissões de Carbono | 
+               Desenvolvido em conformidade com os padrões COP30 2025 e GHG Protocol</p>
+        </footer>
+    </div>
+
+    <script>
+        // Configurações baseadas na COP30 2025
+        const CATEGORY_CONFIG = {
+            energy: {
+                label: 'Energia',
+                units: ['kwh'],
+                subcategories: [
+                    { value: 'grid_brazil', label: 'Rede Elétrica Brasil' },
+                    { value: 'coal', label: 'Carvão Mineral' },
+                    { value: 'natural_gas', label: 'Gás Natural' },
+                    { value: 'solar', label: 'Energia Solar' },
+                    { value: 'wind', label: 'Energia Eólica' }
+                ]
+            },
+            transport: {
+                label: 'Transporte',
+                units: ['km'],
+                subcategories: [
+                    { value: 'gasoline_car', label: 'Carro a Gasolina' },
+                    { value: 'diesel_car', label: 'Carro a Diesel' },
+                    { value: 'electric_car', label: 'Carro Elétrico' },
+                    { value: 'bus', label: 'Ônibus' },
+                    { value: 'truck', label: 'Caminhão' }
+                ]
+            },
+            materials: {
+                label: 'Materiais',
+                units: ['kg', 'ton'],
+                subcategories: [
+                    { value: 'steel', label: 'Aço' },
+                    { value: 'aluminum', label: 'Alumínio' },
+                    { value: 'cement', label: 'Cimento' },
+                    { value: 'plastic', label: 'Plástico' },
+                    { value: 'paper', label: 'Papel' }
+                ]
+            },
+            waste: {
+                label: 'Resíduos',
+                units: ['kg', 'ton'],
+                subcategories: [
+                    { value: 'landfill', label: 'Aterro Sanitário' },
+                    { value: 'incineration', label: 'Incineração' },
+                    { value: 'recycling', label: 'Reciclagem' },
+                    { value: 'composting', label: 'Compostagem' }
+                ]
+            },
+            water: {
+                label: 'Água',
+                units: ['m3', 'liter'],
+                subcategories: [
+                    { value: 'treatment', label: 'Tratamento de Água' },
+                    { value: 'distribution', label: 'Distribuição' },
+                    { value: 'wastewater', label: 'Tratamento de Esgoto' }
+                ]
+            }
+        };
+
+        // Traduções para subcategorias
+        const SUBCATEGORY_TRANSLATIONS = {
+            pt: {
+                // Energia
+                'grid_brazil': 'Rede Elétrica Brasil',
+                'coal': 'Carvão Mineral',
+                'natural_gas': 'Gás Natural',
+                'solar': 'Energia Solar',
+                'wind': 'Energia Eólica',
+                // Transporte
+                'gasoline_car': 'Carro a Gasolina',
+                'diesel_car': 'Carro a Diesel',
+                'electric_car': 'Carro Elétrico',
+                'bus': 'Ônibus',
+                'truck': 'Caminhão',
+                // Materiais
+                'steel': 'Aço',
+                'aluminum': 'Alumínio',
+                'cement': 'Cimento',
+                'plastic': 'Plástico',
+                'paper': 'Papel',
+                // Resíduos
+                'landfill': 'Aterro Sanitário',
+                'incineration': 'Incineração',
+                'recycling': 'Reciclagem',
+                'composting': 'Compostagem',
+                // Água
+                'treatment': 'Tratamento de Água',
+                'distribution': 'Distribuição',
+                'wastewater': 'Tratamento de Esgoto'
+            },
+            en: {
+                // Energia
+                'grid_brazil': 'Brazil Electrical Grid',
+                'coal': 'Coal',
+                'natural_gas': 'Natural Gas',
+                'solar': 'Solar Energy',
+                'wind': 'Wind Energy',
+                // Transporte
+                'gasoline_car': 'Gasoline Car',
+                'diesel_car': 'Diesel Car',
+                'electric_car': 'Electric Car',
+                'bus': 'Bus',
+                'truck': 'Truck',
+                // Materiais
+                'steel': 'Steel',
+                'aluminum': 'Aluminum',
+                'cement': 'Cement',
+                'plastic': 'Plastic',
+                'paper': 'Paper',
+                // Resíduos
+                'landfill': 'Landfill',
+                'incineration': 'Incineration',
+                'recycling': 'Recycling',
+                'composting': 'Composting',
+                // Água
+                'treatment': 'Water Treatment',
+                'distribution': 'Distribution',
+                'wastewater': 'Wastewater Treatment'
+            },
+            es: {
+                // Energia
+                'grid_brazil': 'Red Eléctrica Brasil',
+                'coal': 'Carbón Mineral',
+                'natural_gas': 'Gas Natural',
+                'solar': 'Energía Solar',
+                'wind': 'Energía Eólica',
+                // Transporte
+                'gasoline_car': 'Coche a Gasolina',
+                'diesel_car': 'Coche a Diésel',
+                'electric_car': 'Coche Eléctrico',
+                'bus': 'Autobús',
+                'truck': 'Camión',
+                // Materiais
+                'steel': 'Acero',
+                'aluminum': 'Aluminio',
+                'cement': 'Cemento',
+                'plastic': 'Plástico',
+                'paper': 'Papel',
+                // Resíduos
+                'landfill': 'Vertedero',
+                'incineration': 'Incineração',
+                'recycling': 'Reciclaje',
+                'composting': 'Compostaje',
+                // Água
+                'treatment': 'Tratamiento de Agua',
+                'distribution': 'Distribución',
+                'wastewater': 'Tratamiento de Aguas Residuales'
+            }
+        };
+
+        // Dados dos gráficos
+        let emissionData = {
+            labels: ['Energia', 'Transporte', 'Materiais', 'Resíduos', 'Água'],
+            datasets: [{
+                label: 'Emissões por Categoria (tCO₂e)',
+                data: [0, 0, 0, 0, 0],
+                backgroundColor: [
+                    '#FF6B6B',
+                    '#4ECDC4',
+                    '#45B7D1',
+                    '#96CEB4',
+                    '#FECA57'
+                ]
+            }]
+        };
+
+        let scopeData = {
+            labels: ['Escopo 1 - Diretas', 'Escopo 2 - Indiretas', 'Escopo 3 - Outras'],
+            datasets: [{
+                label: 'Emissões por Escopo (tCO₂e)',
+                data: [0, 0, 0],
+                backgroundColor: [
+                    '#EF5350',
+                    '#42A5F5',
+                    '#AB47BC'
+                ]
+            }]
+        };
+
+        // Inicializar gráficos
+        let emissionsChart, scopeChart;
+
+        function initializeCharts() {
+            const currentLang = document.documentElement.getAttribute('lang') || 'pt';
+            
+            const chartTexts = {
+                pt: {
+                    emissionsByCategory: 'Emissões por Categoria - COP30 2025',
+                    distributionByScope: 'Distribuição por Escopo - GHG Protocol',
+                    emissionsByCategoryLabel: 'Emissões por Categoria (tCO₂e)',
+                    emissionsByScopeLabel: 'Emissões por Escopo (tCO₂e)',
+                    categories: ['Energia', 'Transporte', 'Materiais', 'Resíduos', 'Água'],
+                    scopes: ['Escopo 1 - Diretas', 'Escopo 2 - Indiretas', 'Escopo 3 - Outras']
+                },
+                en: {
+                    emissionsByCategory: 'Emissions by Category - COP30 2025',
+                    distributionByScope: 'Distribution by Scope - GHG Protocol',
+                    emissionsByCategoryLabel: 'Emissions by Category (tCO₂e)',
+                    emissionsByScopeLabel: 'Emissions by Scope (tCO₂e)',
+                    categories: ['Energy', 'Transport', 'Materials', 'Waste', 'Water'],
+                    scopes: ['Scope 1 - Direct', 'Scope 2 - Indirect', 'Scope 3 - Other']
+                },
+                es: {
+                    emissionsByCategory: 'Emisiones por Categoría - COP30 2025',
+                    distributionByScope: 'Distribución por Alcance - GHG Protocol',
+                    emissionsByCategoryLabel: 'Emisiones por Categoría (tCO₂e)',
+                    emissionsByScopeLabel: 'Emisiones por Alcance (tCO₂e)',
+                    categories: ['Energía', 'Transporte', 'Materiales', 'Residuos', 'Agua'],
+                    scopes: ['Alcance 1 - Directas', 'Alcance 2 - Indirectas', 'Alcance 3 - Otras']
+                }
+            };
+            
+            const texts = chartTexts[currentLang];
+            
+            // Atualizar labels dos dados
+            emissionData.labels = texts.categories;
+            emissionData.datasets[0].label = texts.emissionsByCategoryLabel;
+            
+            scopeData.labels = texts.scopes;
+            scopeData.datasets[0].label = texts.emissionsByScopeLabel;
+            
+            // Destruir gráficos existentes
+            if (emissionsChart) emissionsChart.destroy();
+            if (scopeChart) scopeChart.destroy();
+            
+            // Criar novos gráficos
+            const chartTextColor = getComputedStyle(document.documentElement).getPropertyValue('--chart-text-color');
+            const borderColor = getComputedStyle(document.documentElement).getPropertyValue('--border-color');
+            
+            emissionsChart = new Chart(document.getElementById('emissions-chart'), {
+                type: 'bar',
+                data: emissionData,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                color: chartTextColor
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: texts.emissionsByCategory,
+                            color: chartTextColor,
+                            font: {
+                                size: 16
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: {
+                                color: chartTextColor
+                            },
+                            grid: {
+                                color: borderColor
+                            }
+                        },
+                        y: {
+                            ticks: {
+                                color: chartTextColor
+                            },
+                            grid: {
+                                color: borderColor
+                            }
+                        }
+                    }
+                }
+            });
+
+            scopeChart = new Chart(document.getElementById('scope-chart'), {
+                type: 'doughnut',
+                data: scopeData,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: chartTextColor,
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: texts.distributionByScope,
+                            color: chartTextColor,
+                            font: {
+                                size: 16
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Gerenciar tema
+        function initializeTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            setTheme(savedTheme);
+        }
+
+        function setTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
+            updateThemeButton(theme);
+            // Atualizar gráficos quando o tema mudar
+            if (emissionsChart && scopeChart) {
+                setTimeout(() => {
+                    initializeCharts();
+                }, 100);
+            }
+        }
+
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            setTheme(newTheme);
+        }
+
+        function updateThemeButton(theme) {
+            const themeButton = document.getElementById('theme-toggle');
+            if (themeButton) {
+                const icon = theme === 'light' ? '🌙' : '☀️';
+                const currentLang = document.documentElement.getAttribute('lang') || 'pt';
+                const text = currentLang === 'pt' ? 
+                    (theme === 'light' ? 'Tema Escuro' : 'Tema Claro') :
+                    currentLang === 'en' ? 
+                    (theme === 'light' ? 'Dark Theme' : 'Light Theme') :
+                    (theme === 'light' ? 'Tema Oscuro' : 'Tema Claro');
+                themeButton.innerHTML = `<span>${icon}</span> <span id="theme-text">${text}</span>`;
+            }
+        }
+
+        // Gerenciar idioma
+        function initializeLanguage() {
+            const savedLanguage = localStorage.getItem('language') || 'pt';
+            setLanguage(savedLanguage);
+        }
+
+        function setLanguage(language) {
+            document.documentElement.setAttribute('lang', language);
+            localStorage.setItem('language', language);
+            updateLanguageButton(language);
+            updateTextContent(language);
+            initializeCharts();
+        }
+
+        function updateLanguageButton(language) {
+            const languageButton = document.getElementById('language-toggle');
+            if (languageButton) {
+                const text = language === 'pt' ? 'Idioma' : 
+                            language === 'en' ? 'Language' : 
+                            'Idioma';
+                languageButton.innerHTML = `<span>🌐</span> <span id="language-text">${text}</span>`;
+            }
+        }
+
+        // Atualizar textos dinamicamente
+        function updateTextContent(language) {
+            const translations = {
+                pt: {
+                    // Navegação
+                    configTitle: "Configurações",
+                    themeTitle: "Tema",
+                    languageTitle: "Idioma",
+                    reportsTitle: "Relatórios",
+                    analysisNavTitle: "Análise",
+                    
+                    // Dashboard
+                    dashboardTitle: "Dashboard de Emissões de Carbono - Padrões COP30 2025",
+                    emissionsTotal: "Emissões Totais",
+                    directEmissions: "Emissões Diretas",
+                    indirectEmissions: "Energia Indireta",
+                    otherEmissions: "Outras Emissões",
+                    baseCop30: "Base COP30 2025",
+                    scope1: "Escopo 1 - Diretas",
+                    scope2: "Escopo 2 - Indiretas",
+                    scope3: "Escopo 3 - Outras",
+                    
+                    // Calculadora
+                    calculatorTitle: "Calculadora de Emissões COP30",
+                    categoryLabel: "Categoria de Emissão",
+                    selectCategory: "Selecione uma categoria",
+                    energyOption: "Consumo de Energia",
+                    transportOption: "Transporte",
+                    materialsOption: "Matérias-primas",
+                    wasteOption: "Gestão de Resíduos",
+                    waterOption: "Consumo de Água",
+                    subcategoryLabel: "Tipo Específico",
+                    selectSubcategory: "Selecione o tipo",
+                    quantityLabel: "Quantidade",
+                    quantityPlaceholder: "Ex: 1000",
+                    unitLabel: "Unidade de Medida",
+                    selectUnit: "Selecione uma unidade",
+                    scopeLabel: "Escopo de Emissão",
+                    selectScope: "Selecione um escopo",
+                    scopeDirect: "Escopo 1 - Emissões Diretas",
+                    scopeIndirect: "Escopo 2 - Energia Indireta",
+                    scopeOther: "Escopo 3 - Outras Emissões",
+                    calculateBtn: "Calcular Emissões COP30",
+                    resetBtn: "Resetar Dados",
+                    loadingText: "Calculando emissões conforme padrões COP30...",
+                    
+                    // Outros cards
+                    visualizationTitle: "Visualização de Emissões",
+                    analysisTitle: "Análise de Impacto COP30",
+                    analysisPlaceholder: "Insira dados do processo para ver a análise de impacto baseada nos padrões COP30 2025.",
+                    opportunitiesTitle: "Oportunidades de Redução",
+                    
+                    // Oportunidades
+                    energyTransitionTitle: "Transição Energética",
+                    energyTransitionDesc: "Migre para fontes renováveis como solar e eólica para reduzir emissões do Escopo 2.",
+                    mobilityTitle: "Mobilidade Sustentável",
+                    mobilityDesc: "Adote veículos elétricos e otimize rotas para reduzir emissões de transporte.",
+                    economyTitle: "Economia Circular",
+                    economyDesc: "Implemente práticas de reutilização e reciclagem para reduzir emissões de materiais.",
+                    
+                    // Footer
+                    footerText: "EcoTrace - Sistema de Gestão de Emissões de Carbono | Desenvolvido em conformidade com os padrões COP30 2025 e GHG Protocol",
+                    
+                    // API
+                    apiOnline: "API Online",
+                    apiOffline: "API Offline"
+                },
+                en: {
+                    // Navegação
+                    configTitle: "Settings",
+                    themeTitle: "Theme",
+                    languageTitle: "Language",
+                    reportsTitle: "Reports",
+                    analysisNavTitle: "Analysis",
+                    
+                    // Dashboard
+                    dashboardTitle: "Carbon Emissions Dashboard - COP30 2025 Standards",
+                    emissionsTotal: "Total Emissions",
+                    directEmissions: "Direct Emissions",
+                    indirectEmissions: "Indirect Energy",
+                    otherEmissions: "Other Emissions",
+                    baseCop30: "Base COP30 2025",
+                    scope1: "Scope 1 - Direct",
+                    scope2: "Scope 2 - Indirect",
+                    scope3: "Scope 3 - Other",
+                    
+                    // Calculadora
+                    calculatorTitle: "COP30 Emissions Calculator",
+                    categoryLabel: "Emission Category",
+                    selectCategory: "Select a category",
+                    energyOption: "Energy Consumption",
+                    transportOption: "Transport",
+                    materialsOption: "Raw Materials",
+                    wasteOption: "Waste Management",
+                    waterOption: "Water Consumption",
+                    subcategoryLabel: "Specific Type",
+                    selectSubcategory: "Select the type",
+                    quantityLabel: "Quantity",
+                    quantityPlaceholder: "Ex: 1000",
+                    unitLabel: "Measurement Unit",
+                    selectUnit: "Select a unit",
+                    scopeLabel: "Emission Scope",
+                    selectScope: "Select a scope",
+                    scopeDirect: "Scope 1 - Direct Emissions",
+                    scopeIndirect: "Scope 2 - Indirect Energy",
+                    scopeOther: "Scope 3 - Other Emissions",
+                    calculateBtn: "Calculate COP30 Emissions",
+                    resetBtn: "Reset Data",
+                    loadingText: "Calculating emissions according to COP30 standards...",
+                    
+                    // Outros cards
+                    visualizationTitle: "Emissions Visualization",
+                    analysisTitle: "COP30 Impact Analysis",
+                    analysisPlaceholder: "Enter process data to see impact analysis based on COP30 2025 standards.",
+                    opportunitiesTitle: "Reduction Opportunities",
+                    
+                    // Oportunidades
+                    energyTransitionTitle: "Energy Transition",
+                    energyTransitionDesc: "Migrate to renewable sources such as solar and wind to reduce Scope 2 emissions.",
+                    mobilityTitle: "Sustainable Mobility",
+                    mobilityDesc: "Adopt electric vehicles and optimize routes to reduce transport emissions.",
+                    economyTitle: "Circular Economy",
+                    economyDesc: "Implement reuse and recycling practices to reduce material emissions.",
+                    
+                    // Footer
+                    footerText: "EcoTrace - Carbon Emissions Management System | Developed in compliance with COP30 2025 standards and GHG Protocol",
+                    
+                    // API
+                    apiOnline: "API Online",
+                    apiOffline: "API Offline"
+                },
+                es: {
+                    // Navegação
+                    configTitle: "Configuración",
+                    themeTitle: "Tema",
+                    languageTitle: "Idioma",
+                    reportsTitle: "Informes",
+                    analysisNavTitle: "Análisis",
+                    
+                    // Dashboard
+                    dashboardTitle: "Panel de Emisiones de Carbono - Estándares COP30 2025",
+                    emissionsTotal: "Emisiones Totales",
+                    directEmissions: "Emisiones Directas",
+                    indirectEmissions: "Energía Indirecta",
+                    otherEmissions: "Otras Emisiones",
+                    baseCop30: "Base COP30 2025",
+                    scope1: "Alcance 1 - Directas",
+                    scope2: "Alcance 2 - Indirectas",
+                    scope3: "Alcance 3 - Otras",
+                    
+                    // Calculadora
+                    calculatorTitle: "Calculadora de Emisiones COP30",
+                    categoryLabel: "Categoría de Emisión",
+                    selectCategory: "Seleccione una categoría",
+                    energyOption: "Consumo de Energía",
+                    transportOption: "Transporte",
+                    materialsOption: "Materias Primas",
+                    wasteOption: "Gestión de Residuos",
+                    waterOption: "Consumo de Agua",
+                    subcategoryLabel: "Tipo Específico",
+                    selectSubcategory: "Seleccione el tipo",
+                    quantityLabel: "Cantidad",
+                    quantityPlaceholder: "Ej: 1000",
+                    unitLabel: "Unidad de Medida",
+                    selectUnit: "Seleccione una unidad",
+                    scopeLabel: "Alcance de Emisión",
+                    selectScope: "Seleccione un alcance",
+                    scopeDirect: "Alcance 1 - Emisiones Directas",
+                    scopeIndirect: "Alcance 2 - Energía Indirecta",
+                    scopeOther: "Alcance 3 - Otras Emisiones",
+                    calculateBtn: "Calcular Emisiones COP30",
+                    resetBtn: "Restablecer Datos",
+                    loadingText: "Calculando emisiones según estándares COP30...",
+                    
+                    // Outros cards
+                    visualizationTitle: "Visualización de Emisiones",
+                    analysisTitle: "Análisis de Impacto COP30",
+                    analysisPlaceholder: "Ingrese datos del proceso para ver el análisis de impacto basado en los estándares COP30 2025.",
+                    opportunitiesTitle: "Oportunidades de Reducción",
+                    
+                    // Oportunidades
+                    energyTransitionTitle: "Transición Energética",
+                    energyTransitionDesc: "Migre a fuentes renovables como solar y eólica para reducir emisiones del Alcance 2.",
+                    mobilityTitle: "Movilidad Sostenible",
+                    mobilityDesc: "Adopte vehículos eléctricos y optimice rutas para reducir emisiones de transporte.",
+                    economyTitle: "Economía Circular",
+                    economyDesc: "Implemente prácticas de reutilización y reciclagem para reducir emisiones de materiales.",
+                    
+                    // Footer
+                    footerText: "EcoTrace - Sistema de Gestión de Emisiones de Carbono | Desarrollado en conformidad con los estándares COP30 2025 y GHG Protocol",
+                    
+                    // API
+                    apiOnline: "API En Línea",
+                    apiOffline: "API Desconectada"
+                }
+            };
+
+            const trans = translations[language];
+            
+            // Atualizar navegação
+            document.getElementById('config-text').textContent = trans.configTitle;
+            document.getElementById('theme-text').textContent = trans.themeTitle;
+            document.getElementById('language-text').textContent = trans.languageTitle;
+            document.getElementById('reports-text').textContent = trans.reportsTitle;
+            document.getElementById('analysis-text').textContent = trans.analysisNavTitle;
+            
+            // Atualizar dashboard
+            document.getElementById('dashboard-title-text').textContent = trans.dashboardTitle;
+            document.getElementById('total-emissions-label').textContent = trans.emissionsTotal;
+            document.getElementById('direct-emissions-label').textContent = trans.directEmissions;
+            document.getElementById('indirect-emissions-label').textContent = trans.indirectEmissions;
+            document.getElementById('other-emissions-label').textContent = trans.otherEmissions;
+            document.getElementById('base-cop30-label').textContent = trans.baseCop30;
+            document.getElementById('scope1-label').textContent = trans.scope1;
+            document.getElementById('scope2-label').textContent = trans.scope2;
+            document.getElementById('scope3-label').textContent = trans.scope3;
+            
+            // Atualizar calculadora
+            document.getElementById('calculator-title').textContent = trans.calculatorTitle;
+            document.getElementById('category-label').textContent = trans.categoryLabel;
+            document.getElementById('select-category-option').textContent = trans.selectCategory;
+            document.getElementById('energy-option').textContent = trans.energyOption;
+            document.getElementById('transport-option').textContent = trans.transportOption;
+            document.getElementById('materials-option').textContent = trans.materialsOption;
+            document.getElementById('waste-option').textContent = trans.wasteOption;
+            document.getElementById('water-option').textContent = trans.waterOption;
+            document.getElementById('subcategory-label').textContent = trans.subcategoryLabel;
+            document.getElementById('quantity-label').textContent = trans.quantityLabel;
+            document.getElementById('process-quantity').placeholder = trans.quantityPlaceholder;
+            document.getElementById('unit-label').textContent = trans.unitLabel;
+            document.getElementById('select-unit-option').textContent = trans.selectUnit;
+            document.getElementById('scope-label').textContent = trans.scopeLabel;
+            document.getElementById('select-scope-option').textContent = trans.selectScope;
+            document.getElementById('scope-direct-option').textContent = trans.scopeDirect;
+            document.getElementById('scope-indirect-option').textContent = trans.scopeIndirect;
+            document.getElementById('scope-other-option').textContent = trans.scopeOther;
+            document.getElementById('calculate-btn-text').textContent = trans.calculateBtn;
+            document.getElementById('reset-btn-text').textContent = trans.resetBtn;
+            document.getElementById('loading-text').textContent = trans.loadingText;
+            
+            // Atualizar outros cards
+            document.getElementById('visualization-title').textContent = trans.visualizationTitle;
+            document.getElementById('analysis-title').textContent = trans.analysisTitle;
+            document.getElementById('analysis-placeholder').textContent = trans.analysisPlaceholder;
+            document.getElementById('opportunities-title').textContent = trans.opportunitiesTitle;
+            
+            // Atualizar oportunidades
+            document.getElementById('energy-transition-title').textContent = trans.energyTransitionTitle;
+            document.getElementById('energy-transition-desc').textContent = trans.energyTransitionDesc;
+            document.getElementById('mobility-title').textContent = trans.mobilityTitle;
+            document.getElementById('mobility-desc').textContent = trans.mobilityDesc;
+            document.getElementById('economy-title').textContent = trans.economyTitle;
+            document.getElementById('economy-desc').textContent = trans.economyDesc;
+            
+            // Atualizar rodapé
+            document.getElementById('footer-text').textContent = trans.footerText;
+            
+            // Atualizar status da API
+            const apiStatus = document.getElementById('api-status');
+            if (apiStatus.textContent.includes('Online') || apiStatus.textContent.includes('En Línea')) {
+                apiStatus.textContent = trans.apiOnline;
+            } else {
+                apiStatus.textContent = trans.apiOffline;
+            }
+        }
+
+        // Verificar status da API
+        async function checkApiStatus() {
+            try {
+                const response = await fetch('/api/health');
+                if (response.ok) {
+                    const currentLang = document.documentElement.getAttribute('lang') || 'pt';
+                    const translations = {
+                        pt: 'API Online',
+                        en: 'API Online',
+                        es: 'API En Línea'
+                    };
+                    document.getElementById('api-status').textContent = translations[currentLang];
+                    document.getElementById('api-status').className = 'status-indicator status-online';
+                    return true;
+                }
+            } catch (error) {
+                const currentLang = document.documentElement.getAttribute('lang') || 'pt';
+                const translations = {
+                    pt: 'API Offline',
+                    en: 'API Offline',
+                    es: 'API Desconectada'
+                };
+                document.getElementById('api-status').textContent = translations[currentLang];
+                document.getElementById('api-status').className = 'status-indicator status-offline';
+                return false;
+            }
+        }
+
+        // Gerenciar dinamicamente subcategorias e unidades
+        document.getElementById('process-category').addEventListener('change', function() {
+            const category = this.value;
+            const subcategoryGroup = document.getElementById('subcategory-group');
+            const subcategorySelect = document.getElementById('process-subcategory');
+            const unitSelect = document.getElementById('process-unit');
+            
+            if (category && CATEGORY_CONFIG[category]) {
+                subcategoryGroup.style.display = 'block';
+                
+                // Preencher subcategorias
+                const currentLang = document.documentElement.getAttribute('lang') || 'pt';
+                const selectText = currentLang === 'pt' ? 'Selecione o tipo' : 
+                                 currentLang === 'en' ? 'Select the type' : 
+                                 'Seleccione el tipo';
+                subcategorySelect.innerHTML = `<option value="">${selectText}</option>`;
+                
+                CATEGORY_CONFIG[category].subcategories.forEach(sub => {
+                    const translatedLabel = SUBCATEGORY_TRANSLATIONS[currentLang][sub.value] || sub.label;
+                    subcategorySelect.innerHTML += `<option value="${sub.value}">${translatedLabel}</option>`;
+                });
+                
+                // Preencher unidades
+                const selectUnitText = currentLang === 'pt' ? 'Selecione uma unidade' : 
+                                      currentLang === 'en' ? 'Select a unit' : 
+                                      'Seleccione una unidad';
+                unitSelect.innerHTML = `<option value="">${selectUnitText}</option>`;
+                CATEGORY_CONFIG[category].units.forEach(unit => {
+                    unitSelect.innerHTML += `<option value="${unit}">${unit.toUpperCase()}</option>`;
+                });
+            } else {
+                subcategoryGroup.style.display = 'none';
+                subcategorySelect.innerHTML = '';
+                const currentLang = document.documentElement.getAttribute('lang') || 'pt';
+                const selectUnitText = currentLang === 'pt' ? 'Selecione uma unidade' : 
+                                      currentLang === 'en' ? 'Select a unit' : 
+                                      'Seleccione una unidad';
+                unitSelect.innerHTML = `<option value="">${selectUnitText}</option>`;
+            }
+        });
+
+        // Processar formulário
+        document.getElementById('emission-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // Verificar se API está online
+            const apiOnline = await checkApiStatus();
+            if (!apiOnline) {
+                const currentLang = document.documentElement.getAttribute('lang') || 'pt';
+                const errorMsg = currentLang === 'pt' ? 
+                    '❌ Erro: A API do backend não está disponível. Certifique-se de que o servidor Python está rodando.' :
+                    currentLang === 'en' ? 
+                    '❌ Error: The backend API is not available. Make sure the Python server is running.' :
+                    '❌ Error: La API del backend no está disponible. Asegúrese de que el servidor Python esté ejecutándose.';
+                alert(errorMsg);
+                return;
+            }
+            
+            const formData = {
+                category: document.getElementById('process-category').value,
+                subcategory: document.getElementById('process-subcategory').value,
+                quantity: document.getElementById('process-quantity').value,
+                unit: document.getElementById('process-unit').value,
+                scope: document.getElementById('process-scope').value
+            };
+            
+            // Validação
+            const currentLang = document.documentElement.getAttribute('lang') || 'pt';
+            const validationMsg = currentLang === 'pt' ? 
+                'Por favor, preencha todos os campos obrigatórios.' :
+                currentLang === 'en' ? 'Please fill in all required fields.' :
+                'Por favor, complete todos los campos obligatorios.';
+                
+            if (!formData.category || !formData.quantity || !formData.unit || !formData.scope) {
+                alert(validationMsg);
+                return;
+            }
+            
+            // Mostrar loading
+            document.getElementById('calculation-loading').style.display = 'block';
+            
+            try {
+                const response = await fetch('/api/calculate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok && result.success) {
+                    updateDashboard(result.data);
+                    updateImpactAnalysis(result.data);
+                    const successMsg = currentLang === 'pt' ? 'Emissões calculadas com sucesso!' :
+                                      currentLang === 'en' ? 'Emissions calculated successfully!' :
+                                      '¡Emisiones calculadas con éxito!';
+                    showSuccessMessage(successMsg);
+                } else {
+                    throw new Error(result.error || 'Erro no cálculo');
+                }
+            } catch (error) {
+                console.error('Erro detalhado:', error);
+                const errorMsg = currentLang === 'pt' ? '❌ Erro ao calcular emissões: ' :
+                                currentLang === 'en' ? '❌ Error calculating emissions: ' :
+                                '❌ Error al calcular emisiones: ';
+                alert(errorMsg + error.message);
+            } finally {
+                document.getElementById('calculation-loading').style.display = 'none';
+                this.reset();
+                document.getElementById('subcategory-group').style.display = 'none';
+            }
+        });
+
+        // Função para mostrar mensagem de sucesso
+        function showSuccessMessage(message) {
+            const successDiv = document.createElement('div');
+            successDiv.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #4CAF50;
+                color: white;
+                padding: 15px 20px;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                z-index: 1000;
+                font-weight: 500;
+            `;
+            successDiv.innerHTML = `✅ ${message}`;
+            document.body.appendChild(successDiv);
+            
+            setTimeout(() => {
+                document.body.removeChild(successDiv);
+            }, 3000);
+        }
+
+        // Função para resetar os dados
+        document.getElementById('reset-btn').addEventListener('click', async function() {
+            const currentLang = document.documentElement.getAttribute('lang') || 'pt';
+            const confirmMsg = currentLang === 'pt' ? 'Tem certeza que deseja resetar todos os dados?' :
+                              currentLang === 'en' ? 'Are you sure you want to reset all data?' :
+                              '¿Está seguro de que desea restablecer todos los datos?';
+            
+            if (confirm(confirmMsg)) {
+                try {
+                    const response = await fetch('/api/reset', {
+                        method: 'POST'
+                    });
+                    
+                    if (response.ok) {
+                        resetDashboard();
+                        const successMsg = currentLang === 'pt' ? 'Dados resetados com sucesso!' :
+                                          currentLang === 'en' ? 'Data reset successfully!' :
+                                          '¡Datos restablecidos con éxito!';
+                        showSuccessMessage(successMsg);
+                    } else {
+                        throw new Error('Erro ao resetar dados');
+                    }
+                } catch (error) {
+                    const errorMsg = currentLang === 'pt' ? '❌ Erro ao resetar dados: ' :
+                                    currentLang === 'en' ? '❌ Error resetting data: ' :
+                                    '❌ Error al restablecer datos: ';
+                    alert(errorMsg + error.message);
+                }
+            }
+        });
+
+        // Atualizar dashboard com novos dados
+        function updateDashboard(result) {
+            const totalEmissionsElement = document.getElementById('total-emissions');
+            const directElement = document.getElementById('direct-emissions');
+            const indirectElement = document.getElementById('indirect-emissions');
+            const otherElement = document.getElementById('other-emissions');
+            
+            let totalEmissions = parseFloat(totalEmissionsElement.textContent) || 0;
+            let directEmissions = parseFloat(directElement.textContent) || 0;
+            let indirectEmissions = parseFloat(indirectElement.textContent) || 0;
+            let otherEmissions = parseFloat(otherElement.textContent) || 0;
+            
+            const emissionsInTons = result.emissions_tons;
+            totalEmissions += emissionsInTons;
+            
+            if (result.scope === 'direct') {
+                directEmissions += emissionsInTons;
+            } else if (result.scope === 'indirect') {
+                indirectEmissions += emissionsInTons;
+            } else if (result.scope === 'other') {
+                otherEmissions += emissionsInTons;
+            }
+            
+            totalEmissionsElement.textContent = totalEmissions.toFixed(2) + ' tCO₂e';
+            directElement.textContent = directEmissions.toFixed(2) + ' tCO₂e';
+            indirectElement.textContent = indirectEmissions.toFixed(2) + ' tCO₂e';
+            otherElement.textContent = otherEmissions.toFixed(2) + ' tCO₂e';
+            
+            updateCharts(result.category, result.scope, emissionsInTons);
+        }
+
+        // Atualizar gráficos
+        function updateCharts(category, scope, emissions) {
+            const categoryIndex = getCategoryIndex(category);
+            if (categoryIndex !== -1) {
+                emissionData.datasets[0].data[categoryIndex] += emissions;
+                emissionsChart.update();
+            }
+            
+            const scopeIndex = getScopeIndex(scope);
+            if (scopeIndex !== -1) {
+                scopeData.datasets[0].data[scopeIndex] += emissions;
+                scopeChart.update();
+            }
+        }
+
+        // Obter índice da categoria para o gráfico
+        function getCategoryIndex(category) {
+            const currentLang = document.documentElement.getAttribute('lang') || 'pt';
+            const categoryMap = {
+                'energy': 0,
+                'transport': 1,
+                'materials': 2,
+                'waste': 3,
+                'water': 4
+            };
+            return categoryMap[category] !== undefined ? categoryMap[category] : -1;
+        }
+
+        // Obter índice do escopo para o gráfico
+        function getScopeIndex(scope) {
+            const scopeMap = {
+                'direct': 0,
+                'indirect': 1,
+                'other': 2
+            };
+            return scopeMap[scope] !== undefined ? scopeMap[scope] : -1;
+        }
+
+        // Atualizar análise de impacto
+        function updateImpactAnalysis(result) {
+            const impactElement = document.getElementById('impact-analysis');
+            const emissionsInTons = result.emissions_tons;
+            const currentLang = document.documentElement.getAttribute('lang') || 'pt';
+            
+            let impactText = '';
+            let scopeBadge = '';
+            
+            // Textos traduzidos para análise de impacto
+            const impactTexts = {
+                pt: {
+                    highImpact: "ALTO IMPACTO",
+                    moderateImpact: "IMPACTO MODERADO",
+                    lowImpact: "BAIXO IMPACTO",
+                    highDesc: "Esta atividade possui significativas emissões de carbono.",
+                    moderateDesc: "Emissões dentro de parâmetros moderados.",
+                    lowDesc: "Emissões controladas e dentro de limites aceitáveis.",
+                    actionHigh: "Priorize medidas de redução imediatas.",
+                    actionModerate: "Implemente otimizações contínuas.",
+                    actionLow: "Mantenha o monitoramento regular.",
+                    recommendedAction: "Ação Recomendada:"
+                },
+                en: {
+                    highImpact: "HIGH IMPACT",
+                    moderateImpact: "MODERATE IMPACT",
+                    lowImpact: "LOW IMPACT",
+                    highDesc: "This activity has significant carbon emissions.",
+                    moderateDesc: "Emissions within moderate parameters.",
+                    lowDesc: "Controlled emissions within acceptable limits.",
+                    actionHigh: "Prioritize immediate reduction measures.",
+                    actionModerate: "Implement continuous optimizations.",
+                    actionLow: "Maintain regular monitoring.",
+                    recommendedAction: "Recommended Action:"
+                },
+                es: {
+                    highImpact: "ALTO IMPACTO",
+                    moderateImpact: "IMPACTO MODERADO",
+                    lowImpact: "BAJO IMPACTO",
+                    highDesc: "Esta actividad tiene emisiones significativas de carbono.",
+                    moderateDesc: "Emisiones dentro de parámetros moderados.",
+                    lowDesc: "Emisiones controladas dentro de límites aceptables.",
+                    actionHigh: "Priorice medidas de reducción inmediatas.",
+                    actionModerate: "Implemente optimizaciones continuas.",
+                    actionLow: "Mantenga el monitoreo regular.",
+                    recommendedAction: "Acción Recomendada:"
+                }
+            };
+            
+            const texts = impactTexts[currentLang];
+            
+            // Traduzir o escopo
+            if (result.scope === 'direct') {
+                scopeBadge = currentLang === 'pt' ? '<span class="scope-badge scope-direct">Escopo 1</span>' :
+                            currentLang === 'en' ? '<span class="scope-badge scope-direct">Scope 1</span>' :
+                            '<span class="scope-badge scope-direct">Alcance 1</span>';
+            } else if (result.scope === 'indirect') {
+                scopeBadge = currentLang === 'pt' ? '<span class="scope-badge scope-indirect">Escopo 2</span>' :
+                            currentLang === 'en' ? '<span class="scope-badge scope-indirect">Scope 2</span>' :
+                            '<span class="scope-badge scope-indirect">Alcance 2</span>';
+            } else {
+                scopeBadge = currentLang === 'pt' ? '<span class="scope-badge scope-other">Escopo 3</span>' :
+                            currentLang === 'en' ? '<span class="scope-badge scope-other">Scope 3</span>' :
+                            '<span class="scope-badge scope-other">Alcance 3</span>';
+            }
+            
+            if (emissionsInTons > 10) {
+                impactText = `
+                    <div class="impact-content" style="background: #ffebee; padding: 1rem; border-radius: 8px; border-left: 4px solid #c62828;">
+                        <h3 style="color: #c62828; margin-bottom: 0.5rem;">
+                            ⚠️ ${texts.highImpact} ${scopeBadge}
+                        </h3>
+                        <p><strong>${emissionsInTons.toFixed(2)} tCO₂e</strong> - ${texts.highDesc}</p>
+                        <p style="margin-top: 0.5rem;"><strong>${texts.recommendedAction}</strong> ${texts.actionHigh}</p>
+                    </div>
+                `;
+            } else if (emissionsInTons > 2) {
+                impactText = `
+                    <div class="impact-content" style="background: #fff3e0; padding: 1rem; border-radius: 8px; border-left: 4px solid #ef6c00;">
+                        <h3 style="color: #ef6c00; margin-bottom: 0.5rem;">
+                            📊 ${texts.moderateImpact} ${scopeBadge}
+                        </h3>
+                        <p><strong>${emissionsInTons.toFixed(2)} tCO₂e</strong> - ${texts.moderateDesc}</p>
+                        <p style="margin-top: 0.5rem;"><strong>${texts.recommendedAction}</strong> ${texts.actionModerate}</p>
+                    </div>
+                `;
+            } else {
+                impactText = `
+                    <div class="impact-content" style="background: #e8f5e8; padding: 1rem; border-radius: 8px; border-left: 4px solid #2e7d32;">
+                        <h3 style="color: #2e7d32; margin-bottom: 0.5rem;">
+                            ✅ ${texts.lowImpact} ${scopeBadge}
+                        </h3>
+                        <p><strong>${emissionsInTons.toFixed(2)} tCO₂e</strong> - ${texts.lowDesc}</p>
+                        <p style="margin-top: 0.5rem;"><strong>${texts.recommendedAction}</strong> ${texts.actionLow}</p>
+                    </div>
+                `;
+            }
+            
+            impactElement.innerHTML = impactText;
+        }
+
+        // Função para resetar o dashboard
+        function resetDashboard() {
+            document.getElementById('total-emissions').textContent = '0.00 tCO₂e';
+            document.getElementById('direct-emissions').textContent = '0.00 tCO₂e';
+            document.getElementById('indirect-emissions').textContent = '0.00 tCO₂e';
+            document.getElementById('other-emissions').textContent = '0.00 tCO₂e';
+            
+            emissionData.datasets[0].data = [0, 0, 0, 0, 0];
+            scopeData.datasets[0].data = [0, 0, 0];
+            
+            emissionsChart.update();
+            scopeChart.update();
+            
+            const currentLang = document.documentElement.getAttribute('lang') || 'pt';
+            const placeholderText = currentLang === 'pt' ? 
+                'Insira dados do processo para ver a análise de impacto baseada nos padrões COP30 2025.' :
+                currentLang === 'en' ? 
+                'Enter process data to see impact analysis based on COP30 2025 standards.' :
+                'Ingrese datos del proceso para ver el análisis de impacto basado en los estándares COP30 2025.';
+            
+            document.getElementById('impact-analysis').innerHTML = `<p id="analysis-placeholder">${placeholderText}</p>`;
+            
+            document.getElementById('emission-form').reset();
+            document.getElementById('subcategory-group').style.display = 'none';
+        }
+
+        // Gerenciar menus dropdown
+        function setupDropdowns() {
+            const configToggle = document.getElementById('config-toggle');
+            const configMenu = document.getElementById('config-menu');
+            const languageToggle = document.getElementById('language-toggle');
+            const languageOptions = document.getElementById('language-options');
+            
+            // Toggle do menu de configurações
+            configToggle.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                configMenu.classList.toggle('active');
+                // Fechar menu de idiomas se estiver aberto
+                languageOptions.classList.remove('active');
+            });
+            
+            // Toggle do menu de idiomas
+            languageToggle.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                languageOptions.classList.toggle('active');
+            });
+            
+            // Selecionar idioma
+            document.querySelectorAll('#language-options a').forEach(option => {
+                option.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const lang = this.getAttribute('data-lang');
+                    setLanguage(lang);
+                    // Fechar menus
+                    configMenu.classList.remove('active');
+                    languageOptions.classList.remove('active');
+                });
+            });
+            
+            // Toggle do tema
+            document.getElementById('theme-toggle').addEventListener('click', function(e) {
+                e.preventDefault();
+                toggleTheme();
+                // Fechar menu de configurações
+                configMenu.classList.remove('active');
+            });
+            
+            // Fechar menus ao clicar fora
+            document.addEventListener('click', function() {
+                configMenu.classList.remove('active');
+                languageOptions.classList.remove('active');
+            });
+        }
+
+        // Inicializar aplicação
+        async function initializeApp() {
+            await checkApiStatus();
+            initializeTheme();
+            initializeLanguage();
+            initializeCharts();
+            setupDropdowns();
+            
+            console.log('🚀 EcoTrace Dashboard inicializado');
+        }
+
+        // Inicializar quando a página carregar
+        document.addEventListener('DOMContentLoaded', initializeApp);
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const relatorios = document.querySelector('.reports-text');
+            
+            if (relatorios) {
+                relatorios.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    window.location.href = '/relatorios';
+                });
+            }
+        });
+    </script>
+</body>
+</html>
