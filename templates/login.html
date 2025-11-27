@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoTrace</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+ 
+        body {
+            background: linear-gradient(135deg, #0a3d2e 0%, #1a6b4f 100%);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+ 
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+ 
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+ 
+        .logo {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, #4cd964, #5ac8fa);
+            background-clip: border-box;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+ 
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.8;
+            margin-bottom: 20px;
+        }
+ 
+        .card-container {
+            display: flex;
+            width: 100%;
+            max-width: 900px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+        }
+ 
+        .illustration {
+            flex: 1;
+            background: linear-gradient(135deg, #1a6b4f 0%, #0a3d2e 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+ 
+        .illustration::before {
+            content: "";
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            top: -50px;
+            left: -50px;
+        }
+ 
+        .illustration::after {
+            content: "";
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
+            bottom: -50px;
+            right: -50px;
+        }
+ 
+        .leaf-icon {
+            font-size: 5rem;
+            margin-bottom: 20px;
+            color: #4cd964;
+        }
+ 
+        .illustration h2 {
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+ 
+        .illustration p {
+            text-align: center;
+            opacity: 0.8;
+            line-height: 1.6;
+        }
+ 
+        .form-container {
+            flex: 1;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.95);
+            color: #333;
+        }
+ 
+        .form-toggle {
+            display: flex;
+            margin-bottom: 30px;
+            border-radius: 30px;
+            background: #f0f0f0;
+            padding: 5px;
+        }
+ 
+        .toggle-btn {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+ 
+        .toggle-btn.active {
+            background: #1a6b4f;
+            color: white;
+        }
+ 
+        .form {
+            display: none;
+        }
+ 
+        .form.active {
+            display: block;
+        }
+ 
+        .form h2 {
+            margin-bottom: 25px;
+            color: #1a6b4f;
+            font-size: 1.8rem;
+        }
+ 
+        .input-group {
+            margin-bottom: 20px;
+        }
+ 
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #555;
+        }
+ 
+        .input-group input {
+            width: 100%;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+ 
+        .input-group input:focus {
+            border-color: #1a6b4f;
+            box-shadow: 0 0 0 2px rgba(26, 107, 79, 0.2);
+            outline: none;
+        }
+ 
+        .remember-forgot {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            font-size: 0.9rem;
+        }
+ 
+        .remember {
+            display: flex;
+            align-items: center;
+        }
+ 
+        .remember input {
+            margin-right: 8px;
+        }
+ 
+        .forgot {
+            color: #1a6b4f;
+            text-decoration: none;
+            font-weight: 500;
+        }
+ 
+        .btn {
+            width: 100%;
+            padding: 15px;
+            background: #1a6b4f;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+ 
+        .btn:hover {
+            background: #0a3d2e;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+ 
+        .social-login {
+            text-align: center;
+            margin-top: 25px;
+        }
+ 
+        .social-login p {
+            margin-bottom: 15px;
+            color: #777;
+            position: relative;
+        }
+ 
+        .social-login p::before, .social-login p::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            width: 30%;
+            height: 1px;
+            background: #ddd;
+        }
+ 
+        .social-login p::before {
+            left: 0;
+        }
+ 
+        .social-login p::after {
+            right: 0;
+        }
+ 
+        .social-icons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+ 
+        .social-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f5f5f5;
+            color: #555;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+ 
+        .social-icon:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+        }
+ 
+        .footer {
+            margin-top: 40px;
+            text-align: center;
+            opacity: 0.7;
+            font-size: 0.9rem;
+        }
+ 
+        @media (max-width: 768px) {
+            .card-container {
+                flex-direction: column;
+            }
+           
+            .illustration {
+                padding: 30px 20px;
+            }
+           
+            .form-container {
+                padding: 30px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1 class="logo">EcoTrace</h1>
+            <p class="subtitle">Junte-se à comunidade sustentável da COP30</p>
+        </header>
+       
+        <div class="card-container">
+            <div class="illustration">
+                <div class="leaf-icon">🌱</div>
+                <h2>Faça parte da mudança</h2>
+                <p>Conecte-se com pessoas comprometidas com um futuro sustentável. Juntos podemos fazer a diferença para o nosso planeta.</p>
+            </div>
+           
+            <div class="form-container">
+                <div class="form-toggle">
+                    <div class="toggle-btn active" id="login-toggle">Login</div>
+                    <div class="toggle-btn" id="register-toggle">Cadastro</div>
+                </div>
+               
+                <form class="form active" id="login-form">
+                    <h2>Entre na sua conta</h2>
+                   
+                    <div class="input-group">
+                        <label for="login-email">Email</label>
+                        <input type="email" id="login-email" placeholder="seu@email.com">
+                    </div>
+                   
+                    <div class="input-group">
+                        <label for="login-password">Senha</label>
+                        <input type="password" id="login-password" placeholder="Sua senha">
+                    </div>
+                   
+                    <div class="remember-forgot">
+                        <div class="remember">
+                            <input type="checkbox" id="remember">
+                            <label for="remember">Lembrar-me</label>
+                        </div>
+                        <a href="#" class="forgot">Esqueceu a senha?</a>
+                    </div>
+                   
+                    <button type="submit" class="btn">Entrar</button>
+                   
+                    <div class="social-login">
+                        <p>Ou entre com</p>
+                        <div class="social-icons">
+                            <a href="#" class="social-icon">G</a>
+                            <a href="#" class="social-icon">f</a>
+                            <a href="#" class="social-icon">in</a>
+                        </div>
+                    </div>
+                </form>
+               
+                <form class="form" id="register-form">
+                    <h2>Crie sua conta</h2>
+                   
+                    <div class="input-group">
+                        <label for="register-name">Nome completo</label>
+                        <input type="text" id="register-name" placeholder="Seu nome completo">
+                    </div>
+                   
+                    <div class="input-group">
+                        <label for="register-email">Email</label>
+                        <input type="email" id="register-email" placeholder="seu@email.com">
+                    </div>
+                   
+                    <div class="input-group">
+                        <label for="register-password">Senha</label>
+                        <input type="password" id="register-password" placeholder="Crie uma senha">
+                    </div>
+                   
+                    <div class="input-group">
+                        <label for="register-confirm">Confirmar senha</label>
+                        <input type="password" id="register-confirm" placeholder="Confirme sua senha">
+                    </div>
+                   
+                    <button type="submit" class="btn">Cadastrar</button>
+                   
+                    <div class="social-login">
+                        <p>Ou cadastre-se com</p>
+                        <div class="social-icons">
+                            <a href="#" class="social-icon">G</a>
+                            <a href="#" class="social-icon">f</a>
+                            <a href="#" class="social-icon">in</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+       
+        <footer class="footer">
+            <p>© 2025 EcoTrace - Todos os direitos reservados | COP30 Sustentabilidade</p>
+        </footer>
+    </div>
+ 
+    <script>
+        // Alternar entre formulários de login e cadastro
+        const loginToggle = document.getElementById('login-toggle');
+        const registerToggle = document.getElementById('register-toggle');
+        const loginForm = document.getElementById('login-form');
+        const registerForm = document.getElementById('register-form');
+       
+        loginToggle.addEventListener('click', () => {
+            loginToggle.classList.add('active');
+            registerToggle.classList.remove('active');
+            loginForm.classList.add('active');
+            registerForm.classList.remove('active');
+        });
+       
+        registerToggle.addEventListener('click', () => {
+            registerToggle.classList.add('active');
+            loginToggle.classList.remove('active');
+            registerForm.classList.add('active');
+            loginForm.classList.remove('active');
+        });
+       
+        // Validação básica dos formulários
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+           
+            if(email && password) {
+                alert('Login realizado com sucesso!');
+                // Aqui você adicionaria a lógica de autenticação real
+            } else {
+                alert('Por favor, preencha todos os campos.');
+            }
+        });
+       
+        registerForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const name = document.getElementById('register-name').value;
+            const email = document.getElementById('register-email').value;
+            const password = document.getElementById('register-password').value;
+            const confirm = document.getElementById('register-confirm').value;
+           
+            if(name && email && password && confirm) {
+                if(password === confirm) {
+                    alert('Cadastro realizado com sucesso!');
+                    // Aqui você adicionaria a lógica de registro real
+                } else {
+                    alert('As senhas não coincidem.');
+                }
+            } else {
+                alert('Por favor, preencha todos os campos.');
+            }
+        });
+    </script>
+</body>
+</html>
+ 

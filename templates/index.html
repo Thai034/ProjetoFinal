@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ecotrace - Sustentabilidade Industrial em Resultados Reais</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #2E8B57;
+            --primary-dark: #1F6B41;
+            --secondary: #1A5276;
+            --light: #F8F9FA;
+            --dark: #343A40;
+            --gray: #6C757D;
+            --bg-color: #ffffff;
+            --text-color: #343A40;
+        }
+
+        [data-theme="dark"] {
+            --primary: #3DA56C;
+            --primary-dark: #2E8B57;
+            --secondary: #2A7BB0;
+            --light: #1E1E1E;
+            --dark: #F8F9FA;
+            --gray: #A0A0A0;
+            --bg-color: #121212;
+            --text-color: #F8F9FA;
+        }
+
+        body {
+            color: var(--text-color);
+            line-height: 1.6;
+            background-color: var(--bg-color);
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        /* Header & Navigation */
+        header {
+            background-color: var(--bg-color);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            transition: background-color 0.3s;
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 7rem;
+            padding: 1rem 5% 1rem 8%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            height: 50px;
+            margin-top: -4rem;
+        }
+
+        .logo img {
+            height: 180%;
+            width: auto;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+
+        .nav-links li {
+            margin-left: 2rem;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        .btn-entrar {
+            display: inline-block;
+            padding: 0.5rem 1.5rem;
+            background-color: var(--primary);
+            color: white;
+            text-decoration: none; /* ← IMPORTANTE: remove sublinhado */
+            border: none;
+            border-radius: 4px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            text-align: center;
+        }
+
+        .btn-entrar:hover {
+            background-color: var(--primary-dark);
+            color: white; /* ← Garante que texto fique branco no hover */
+            text-decoration: none; /* ← Remove qualquer sublinhado no hover */
+        }
+
+        /* Configurações Dropdown */
+        .config-container {
+            position: relative;
+            display: inline-block;
+            margin-left: 1rem;
+        }
+
+        .btn-config {
+            background-color: var(--secondary);
+            color: white;
+            border: none;
+            padding: 0.5rem 1.5rem;
+            border-radius: 4px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .btn-config:hover {
+            background-color: #144265;
+        }
+
+        .config-dropdown {
+            display: none;
+            position: absolute;
+            right: 0;
+            background-color: var(--bg-color);
+            min-width: 200px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            border-radius: 4px;
+            z-index: 1;
+            padding: 1rem;
+            transition: background-color 0.3s;
+        }
+
+        .config-container:hover .config-dropdown {
+            display: block;
+        }
+
+        .theme-toggle, .language-selector {
+            margin-bottom: 1rem;
+        }
+
+        .theme-toggle h4, .language-selector h4 {
+            margin-bottom: 0.5rem;
+            color: var(--text-color);
+        }
+
+        .theme-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .theme-btn {
+            padding: 0.5rem;
+            border: 1px solid var(--gray);
+            background: var(--bg-color);
+            color: var(--text-color);
+            border-radius: 4px;
+            cursor: pointer;
+            flex: 1;
+            transition: all 0.3s;
+        }
+
+        .theme-btn.active {
+            background-color: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .lang-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .lang-btn {
+            padding: 0.5rem;
+            border: 1px solid var(--gray);
+            background: var(--bg-color);
+            color: var(--text-color);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: left;
+        }
+
+        .lang-btn.active {
+            background-color: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4efe9 100%);
+            padding: 10rem 5% 6rem;
+            text-align: center;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        [data-theme="dark"] .hero {
+            background: linear-gradient(135deg, #2a2a2a 0%, #1a3a2a 100%);
+        }
+
+        .hero-content {
+            max-width: 400rem;
+            background-color: var(--bg-color);
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .hero h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--secondary);
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            color: var(--gray);
+        }
+
+        .btn-saiba-mais {
+            background-color: var(--secondary);
+            color: white;
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 4px;
+            font-size: 1.1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .btn-saiba-mais:hover {
+            background-color: #144265;
+        }
+
+        /* Sustainability Circles */
+/* Sustainability Circles - CORRIGIDO */
+.sustainability-circles {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-top: 2rem;
+    flex-wrap: wrap;
+}
+
+.circle-item {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background-color: var(--light); /* ← CORRIGIDO: usa --light em vez de --bg-color */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border: 2px solid var(--primary); /* ← ADICIONADO: borda para melhor visibilidade */
+}
+
+.circle-item:hover {
+    transform: translateY(-10px) scale(1.1);
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
+    background-color: var(--primary);
+}
+
+.circle-item i {
+    font-size: 2rem;
+    color: var(--primary); /* ← COR DO ÍCONE */
+    transition: color 0.3s;
+}
+
+.circle-item:hover i {
+    color: white;
+}
+
+/* Garantir que os círculos fiquem visíveis no tema escuro */
+[data-theme="dark"] .circle-item {
+    background-color: var(--light); /* Fundo mais claro no tema escuro */
+    border-color: var(--primary); /* Borda com a cor primária */
+}
+
+[data-theme="dark"] .circle-item i {
+    color: var(--primary); /* Ícones na cor primária */
+}
+
+        /* Sections Common Styles */
+        section {
+            padding: 5rem 5%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        section h2 {
+            font-size: 2rem;
+            margin-bottom: 2rem;
+            color: var(--secondary);
+            text-align: center;
+        }
+
+        /* Quem Somos Section */
+        .quem-content {
+            max-width: 550px;
+            background-color: var(--light);
+            padding: 2rem;
+            border-radius: 1rem;
+            margin: 0 auto;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: auto;
+        }
+
+        #quem-somos {
+            background: url(../static/imagens/folhasimagens.jpeg);
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+            background-size: cover;
+            padding: 10rem 5% 6rem;
+            text-align: center;
+        }
+
+        #quem-somos p {
+            margin-bottom: 1.5rem;
+            font-size: 1.1rem;
+            text-align: justify;
+            color: var(--text-color);
+        }
+
+        /* O Que Oferecemos Section */
+        #o-que-oferecemos {
+            background-color: var(--light);
+        }
+
+        .servicos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .servico-item {
+            background-color: var(--bg-color);
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s;
+        }
+
+        .servico-item:hover {
+            transform: translateY(-5px);
+        }
+
+        .servico-item h3 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        /* Footer */
+        footer {
+            background: linear-gradient(135deg, var(--primary-dark), #003300);
+            color: white;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-container {
+                flex-direction: column;
+                padding: 1rem;
+            }
+
+            .logo {
+                height: 40px;
+                margin-right: auto;
+                margin-left: 30px;
+            }
+
+            .nav-links {
+                margin-bottom: 1rem;
+            }
+
+            .nav-links li {
+                margin: 0 0.5rem;
+            }
+
+            .hero {
+                padding: 8rem 5% 4rem;
+                flex-direction: column;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .sustainability-circles {
+                margin-top: 2rem;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <!-- Header & Navigation -->
+    <header>
+        <div class="nav-container">
+            <a href="#" class="logo">
+                <img src="../static/imagens/logo-horizontal.png" alt="logo-horizontal">
+            </a>
+            <ul class="nav-links">
+                <li><a href="#quem-somos" data-key="nav.about">Quem somos</a></li>
+                <li><a href="#o-que-oferecemos" data-key="nav.services">O que oferecemos</a></li>
+            </ul>
+            <div class="config-container">
+                <button class="btn-config" data-key="nav.settings">Configurações</button>
+                <div class="config-dropdown">
+                    <div class="theme-toggle">
+                        <h4 data-key="settings.theme">Tema</h4>
+                        <div class="theme-buttons">
+                            <button class="theme-btn active" data-theme="light" data-key="settings.light">Claro</button>
+                            <button class="theme-btn" data-theme="dark" data-key="settings.dark">Escuro</button>
+                        </div>
+                    </div>
+                    <div class="language-selector">
+                        <h4 data-key="settings.language">Idioma</h4>
+                        <div class="lang-buttons">
+                            <button class="lang-btn active" data-lang="pt" data-key="settings.portuguese">Português</button>
+                            <button class="lang-btn" data-lang="en" data-key="settings.english">English</button>
+                            <button class="lang-btn" data-lang="es" data-key="settings.spanish">Español</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <a href="{{url_for('login')}}" class="btn-entrar" data-key="nav.login">Entrar</a>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1 data-key="hero.title">TRANSFORMANDO SUSTENTABILIDADE INDUSTRIAL EM RESULTADOS REAIS</h1>
+            <p data-key="hero.description">Tenha controle total do consumo de energia e elimine desperdícios com insights automáticos. Mais
+                eficiência, menos custos, tudo em tempo real.</p>
+            <button class="btn-saiba-mais" data-key="hero.learnMore">Saiba mais</button>
+            
+            <div class="sustainability-circles">
+                <div class="circle-item">
+                    <i class="fas fa-leaf"></i>
+                </div>
+                <div class="circle-item">
+                    <i class="fas fa-recycle"></i>
+                </div>
+                <div class="circle-item">
+                    <i class="fas fa-solar-panel"></i>
+                </div>
+                <div class="circle-item">
+                    <i class="fas fa-water"></i>
+                </div>
+                <div class="circle-item">
+                    <i class="fas fa-wind"></i>
+                </div>
+                <div class="circle-item">
+                    <i class="fas fa-seedling"></i>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Quem Somos Section -->
+    <section id="quem-somos">
+        <div class="quem-content">
+            <h2 data-key="about.title">QUEM SOMOS</h2>
+            <p data-key="about.text1">Somos a Ecotrace, uma plataforma que une tecnologia avançada e sustentabilidade para trazer precisão,
+                transparência e rastreabilidade à gestão ambiental industrial.</p>
+            <p data-key="about.text2">Nascemos da necessidade de trazer mais transparência, precisão e rastreabilidade aos processos que
+                impactam diretamente o consumo energético e o desempenho operacional.</p>
+            <p data-key="about.text3">Nosso compromisso é oferecer informações confiáveis e suporte estratégico, permitindo decisões mais
+                assertivas, conformidade ambiental e resultados sustentáveis de verdade.</p>
+        </div>
+    </section>
+
+    <!-- O Que Oferecemos Section -->
+    <section id="o-que-oferecemos">
+        <h2 data-key="services.title">O QUE OFERECEMOS</h2>
+        <div class="servicos-grid">
+            <div class="servico-item">
+                <h3 data-key="services.item1.title">Compliance Ambiental Automatizado</h3>
+                <p data-key="services.item1.description">Garanta conformidade com regulamentações ambientais de forma automatizada e sem complicações.</p>
+            </div>
+            <div class="servico-item">
+                <h3 data-key="services.item2.title">Monitoramento Energético em Tempo Real</h3>
+                <p data-key="services.item2.description">Acompanhe o consumo de energia em tempo real e identifique oportunidades de otimização.</p>
+            </div>
+            <div class="servico-item">
+                <h3 data-key="services.item3.title">Painéis ESG Confiáveis e Transparentes</h3>
+                <p data-key="services.item3.description">Relatórios ESG precisos para demonstrar seu compromisso com a sustentabilidade.</p>
+            </div>
+            <div class="servico-item">
+                <h3 data-key="services.item4.title">Dados Claros para Decisões Estratégicas</h3>
+                <p data-key="services.item4.description">Baseie suas decisões em dados claros e insights acionáveis para melhor desempenho.</p>
+            </div>
+            <div class="servico-item">
+                <h3 data-key="services.item5.title">Identificação Automática de Desperdícios</h3>
+                <p data-key="services.item5.description">Detecte automaticamente fontes de desperdício e implemente correções proativas.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <p data-key="footer.copyright">&copy; 2025 Ecotrace. Todos os direitos reservados.</p>
+    </footer>
+
+    <script>
+        // Dicionário de traduções
+        const translations = {
+            pt: {
+                "nav.about": "Quem somos",
+                "nav.services": "O que oferecemos",
+                "nav.settings": "Configurações",
+                "nav.login": "Entrar",
+                "settings.theme": "Tema",
+                "settings.light": "Claro",
+                "settings.dark": "Escuro",
+                "settings.language": "Idioma",
+                "settings.portuguese": "Português",
+                "settings.english": "English",
+                "settings.spanish": "Español",
+                "hero.title": "TRANSFORMANDO SUSTENTABILIDADE INDUSTRIAL EM RESULTADOS REAIS",
+                "hero.description": "Tenha controle total do consumo de energia e elimine desperdícios com insights automáticos. Mais eficiência, menos custos, tudo em tempo real.",
+                "hero.learnMore": "Saiba mais",
+                "about.title": "QUEM SOMOS",
+                "about.text1": "Somos a Ecotrace, uma plataforma que une tecnologia avançada e sustentabilidade para trazer precisão, transparência e rastreabilidade à gestão ambiental industrial.",
+                "about.text2": "Nascemos da necessidade de trazer mais transparência, precisão e rastreabilidade aos processos que impactam diretamente o consumo energético e o desempenho operacional.",
+                "about.text3": "Nosso compromisso é oferecer informações confiáveis e suporte estratégico, permitindo decisões mais assertivas, conformidade ambiental e resultados sustentáveis de verdade.",
+                "services.title": "O QUE OFERECEMOS",
+                "services.item1.title": "Compliance Ambiental Automatizado",
+                "services.item1.description": "Garanta conformidade com regulamentações ambientais de forma automatizada e sem complicações.",
+                "services.item2.title": "Monitoramento Energético em Tempo Real",
+                "services.item2.description": "Acompanhe o consumo de energia em tempo real e identifique oportunidades de otimização.",
+                "services.item3.title": "Painéis ESG Confiáveis e Transparentes",
+                "services.item3.description": "Relatórios ESG precisos para demonstrar seu compromisso com a sustentabilidade.",
+                "services.item4.title": "Dados Claros para Decisões Estratégicas",
+                "services.item4.description": "Baseie suas decisões em dados claros e insights acionáveis para melhor desempenho.",
+                "services.item5.title": "Identificação Automática de Desperdícios",
+                "services.item5.description": "Detecte automaticamente fontes de desperdício e implemente correções proativas.",
+                "footer.copyright": "&copy; 2025 Ecotrace. Todos os direitos reservados."
+            },
+            en: {
+                "nav.about": "About Us",
+                "nav.services": "Our Services",
+                "nav.settings": "Settings",
+                "nav.login": "Login",
+                "settings.theme": "Theme",
+                "settings.light": "Light",
+                "settings.dark": "Dark",
+                "settings.language": "Language",
+                "settings.portuguese": "Portuguese",
+                "settings.english": "English",
+                "settings.spanish": "Spanish",
+                "hero.title": "TRANSFORMING INDUSTRIAL SUSTAINABILITY INTO REAL RESULTS",
+                "hero.description": "Take full control of energy consumption and eliminate waste with automated insights. More efficiency, lower costs, all in real time.",
+                "hero.learnMore": "Learn More",
+                "about.title": "ABOUT US",
+                "about.text1": "We are Ecotrace, a platform that combines advanced technology and sustainability to bring precision, transparency and traceability to industrial environmental management.",
+                "about.text2": "We were born from the need to bring more transparency, precision and traceability to processes that directly impact energy consumption and operational performance.",
+                "about.text3": "Our commitment is to provide reliable information and strategic support, enabling more assertive decisions, environmental compliance and truly sustainable results.",
+                "services.title": "OUR SERVICES",
+                "services.item1.title": "Automated Environmental Compliance",
+                "services.item1.description": "Ensure compliance with environmental regulations in an automated and hassle-free way.",
+                "services.item2.title": "Real-Time Energy Monitoring",
+                "services.item2.description": "Track energy consumption in real time and identify optimization opportunities.",
+                "services.item3.title": "Reliable and Transparent ESG Dashboards",
+                "services.item3.description": "Accurate ESG reports to demonstrate your commitment to sustainability.",
+                "services.item4.title": "Clear Data for Strategic Decisions",
+                "services.item4.description": "Base your decisions on clear data and actionable insights for better performance.",
+                "services.item5.title": "Automatic Waste Identification",
+                "services.item5.description": "Automatically detect sources of waste and implement proactive corrections.",
+                "footer.copyright": "&copy; 2025 Ecotrace. All rights reserved."
+            },
+            es: {
+                "nav.about": "Quiénes Somos",
+                "nav.services": "Nuestros Servicios",
+                "nav.settings": "Configuraciones",
+                "nav.login": "Iniciar Sesión",
+                "settings.theme": "Tema",
+                "settings.light": "Claro",
+                "settings.dark": "Oscuro",
+                "settings.language": "Idioma",
+                "settings.portuguese": "Portugués",
+                "settings.english": "Inglés",
+                "settings.spanish": "Español",
+                "hero.title": "TRANSFORMANDO LA SOSTENIBILIDAD INDUSTRIAL EN RESULTADOS REALES",
+                "hero.description": "Tenga control total del consumo de energía y elimine desperdicios con información automatizada. Más eficiencia, menos costos, todo en tiempo real.",
+                "hero.learnMore": "Saber Más",
+                "about.title": "QUIÉNES SOMOS",
+                "about.text1": "Somos Ecotrace, una plataforma que une tecnología avanzada y sostenibilidad para aportar precisión, transparencia y trazabilidad a la gestión ambiental industrial.",
+                "about.text2": "Nacimos de la necesidad de aportar más transparencia, precisión y trazabilidad a los procesos que impactan directamente el consumo energético y el desempeño operativo.",
+                "about.text3": "Nuestro compromiso es ofrecer información confiable y soporte estratégico, permitiendo decisiones más asertivas, cumplimiento ambiental y resultados verdaderamente sostenibles.",
+                "services.title": "NUESTROS SERVICIOS",
+                "services.item1.title": "Cumplimiento Ambiental Automatizado",
+                "services.item1.description": "Garantice el cumplimiento de las regulaciones ambientales de forma automatizada y sin complicaciones.",
+                "services.item2.title": "Monitoreo Energético en Tiempo Real",
+                "services.item2.description": "Realice un seguimiento del consumo de energía en tiempo real e identifique oportunidades de optimización.",
+                "services.item3.title": "Paneles ESG Confiables y Transparentes",
+                "services.item3.description": "Informes ESG precisos para demostrar su compromiso con la sostenibilidad.",
+                "services.item4.title": "Datos Claros para Decisiones Estratégicas",
+                "services.item4.description": "Base sus decisiones en datos claros e información procesable para un mejor desempeño.",
+                "services.item5.title": "Identificación Automática de Desperdicios",
+                "services.item5.description": "Detecte automáticamente fuentes de desperdicio e implemente correcciones proactivas.",
+                "footer.copyright": "&copy; 2025 Ecotrace. Todos los derechos reservados."
+            }
+        };
+
+        // Smooth scrolling para links internos
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+
+                const targetId = this.getAttribute('href');
+                if (targetId === '#') return;
+
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+
+        // Botão "Saiba Mais" sem link
+        document.querySelector('.btn-saiba-mais').addEventListener('click', function () {
+            alert('Em breve mais informações estarão disponíveis!');
+        });
+
+        // Tema claro/escuro
+        const themeButtons = document.querySelectorAll('.theme-btn');
+        themeButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const theme = this.getAttribute('data-theme');
+                document.body.setAttribute('data-theme', theme);
+                
+                // Atualizar botões ativos
+                themeButtons.forEach(btn => btn.classList.remove('active'));
+                this.classList.add('active');
+                
+                // Salvar preferência
+                localStorage.setItem('theme', theme);
+            });
+        });
+
+        // Carregar tema salvo
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        document.body.setAttribute('data-theme', savedTheme);
+        themeButtons.forEach(btn => {
+            if (btn.getAttribute('data-theme') === savedTheme) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        });
+
+        // Sistema de idiomas
+        const langButtons = document.querySelectorAll('.lang-btn');
+        langButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const lang = this.getAttribute('data-lang');
+                
+                // Atualizar botões ativos
+                langButtons.forEach(btn => btn.classList.remove('active'));
+                this.classList.add('active');
+                
+                // Traduzir conteúdo
+                translateContent(lang);
+                
+                // Salvar preferência
+                localStorage.setItem('language', lang);
+            });
+        });
+
+        // Função para traduzir conteúdo
+        function translateContent(lang) {
+            const elements = document.querySelectorAll('[data-key]');
+            elements.forEach(element => {
+                const key = element.getAttribute('data-key');
+                if (translations[lang] && translations[lang][key]) {
+                    if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
+                        element.placeholder = translations[lang][key];
+                    } else {
+                        element.innerHTML = translations[lang][key];
+                    }
+                }
+            });
+        }
+
+        // Carregar idioma salvo
+        const savedLang = localStorage.getItem('language') || 'pt';
+        langButtons.forEach(btn => {
+            if (btn.getAttribute('data-lang') === savedLang) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        });
+        translateContent(savedLang);
+
+        // Adicione este código no final do seu script existente
+        document.addEventListener('DOMContentLoaded', function() {
+            const entrarBtn = document.querySelector('.btn-entrar');
+            
+            if (entrarBtn) {
+                entrarBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    window.location.href = '/login';
+                });
+            }
+        });
+    </script>
+</body>
+
+</html>

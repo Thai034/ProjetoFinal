@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relatórios de Carbono - EcoTrack</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+ 
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f0f9f0 0%, #e6f4e6 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+ 
+        .reports-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 100, 0, 0.1);
+            overflow: hidden;
+        }
+ 
+        .reports-header {
+            background: linear-gradient(135deg, #2e7d32, #4caf50);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+ 
+        .reports-header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+ 
+        .reports-header p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+ 
+        .period-selector {
+            background: #e8f5e9;
+            padding: 20px;
+            border-bottom: 1px solid #c8e6c9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+        }
+ 
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+ 
+        .dropdown-btn {
+            padding: 12px 20px;
+            background: white;
+            border: 2px solid #2e7d32;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            color: #2e7d32;
+            min-width: 220px;
+            text-align: left;
+            position: relative;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+ 
+        .dropdown-btn::after {
+            content: '▼';
+            font-size: 0.8em;
+            margin-left: 10px;
+        }
+ 
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background: white;
+            min-width: 220px;
+            box-shadow: 0 8px 16px rgba(46, 125, 50, 0.2);
+            border-radius: 8px;
+            z-index: 1000;
+            top: 100%;
+            left: 0;
+            margin-top: 5px;
+            border: 1px solid #c8e6c9;
+        }
+ 
+        .dropdown-content.show {
+            display: block;
+        }
+ 
+        .dropdown-item {
+            padding: 12px 20px;
+            cursor: pointer;
+            border-bottom: 1px solid #e8f5e9;
+            transition: background 0.3s ease;
+        }
+ 
+        .dropdown-item:hover {
+            background: #e8f5e9;
+        }
+ 
+        .dropdown-item:last-child {
+            border-bottom: none;
+        }
+ 
+        .reports-content {
+            padding: 30px;
+        }
+ 
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+ 
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(46, 125, 50, 0.1);
+            border-left: 4px solid #4caf50;
+            transition: transform 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+ 
+        .stat-card::before {
+            content: '🌿';
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 1.5em;
+            opacity: 0.2;
+        }
+ 
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+ 
+        .stat-card h3 {
+            color: #2e7d32;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+ 
+        .stat-value {
+            font-size: 2.2em;
+            font-weight: bold;
+            color: #1b5e20;
+            margin-bottom: 5px;
+        }
+ 
+        .stat-unit {
+            font-size: 0.6em;
+            color: #4caf50;
+            font-weight: normal;
+        }
+ 
+        .stat-change {
+            font-size: 0.9em;
+            font-weight: 600;
+        }
+ 
+        .positive {
+            color: #4caf50;
+        }
+ 
+        .negative {
+            color: #f44336;
+        }
+ 
+        .charts-container {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+ 
+        .chart-card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(46, 125, 50, 0.1);
+            border: 1px solid #e8f5e9;
+        }
+ 
+        .chart-card h2 {
+            color: #2e7d32;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+ 
+        .chart-placeholder {
+            background: #f9fdf9;
+            height: 300px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #4caf50;
+            font-size: 1.1em;
+            border: 2px dashed #c8e6c9;
+            flex-direction: column;
+            gap: 10px;
+        }
+ 
+        .data-table {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(46, 125, 50, 0.1);
+            overflow: hidden;
+            border: 1px solid #e8f5e9;
+        }
+ 
+        .table-header {
+            background: linear-gradient(135deg, #4caf50, #66bb6a);
+            color: white;
+            padding: 20px;
+        }
+ 
+        .table-header h2 {
+            font-size: 1.3em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+ 
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+ 
+        th, td {
+            padding: 15px 20px;
+            text-align: left;
+            border-bottom: 1px solid #e8f5e9;
+        }
+ 
+        th {
+            background: #f1f8e9;
+            font-weight: 600;
+            color: #2e7d32;
+        }
+ 
+        tr:hover {
+            background: #f9fdf9;
+        }
+ 
+        .category-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+ 
+        .badge-transporte {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+ 
+        .badge-energia {
+            background: #f3e5f5;
+            color: #7b1fa2;
+        }
+ 
+        .badge-alimentacao {
+            background: #fff3e0;
+            color: #ef6c00;
+        }
+ 
+        .badge-residuos {
+            background: #e0f2f1;
+            color: #00695c;
+        }
+ 
+        .no-data {
+            text-align: center;
+            padding: 60px 40px;
+            color: #78909c;
+            font-style: italic;
+        }
+ 
+        .no-data-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+ 
+        .export-options {
+            text-align: center;
+            padding: 30px;
+            background: #f1f8e9;
+            border-top: 1px solid #c8e6c9;
+        }
+ 
+        .export-btn {
+            padding: 15px 30px;
+            background: #4caf50;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin: 0 10px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+ 
+        .export-btn:hover {
+            background: #43a047;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
+        }
+ 
+        .export-btn.secondary {
+            background: #66bb6a;
+        }
+ 
+        .export-btn.secondary:hover {
+            background: #4caf50;
+        }
+ 
+        .carbon-impact {
+            background: linear-gradient(135deg, #e8f5e9, #f1f8e9);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+ 
+        .impact-value {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #2e7d32;
+            margin: 10px 0;
+        }
+ 
+        .impact-description {
+            color: #4caf50;
+            font-size: 0.9em;
+        }
+ 
+        @media (max-width: 768px) {
+            .charts-container {
+                grid-template-columns: 1fr;
+            }
+           
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+           
+            .stat-value {
+                font-size: 1.8em;
+            }
+           
+            .period-selector {
+                flex-direction: column;
+            }
+           
+            .export-options {
+                padding: 20px;
+            }
+           
+            .export-btn {
+                padding: 12px 20px;
+                margin: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="reports-container">
+        <div class="reports-header">
+            <h1>📊 Relatórios de Carbono</h1>
+            <p>Monitoramento e análise das suas emissões de carbono</p>
+        </div>
+ 
+        <div class="period-selector">
+            <span>Período de análise:</span>
+            <div class="dropdown">
+                <button class="dropdown-btn" id="periodDropdown">
+                    Selecione o período
+                </button>
+                <div class="dropdown-content" id="dropdownContent">
+                    <div class="dropdown-item" data-period="day">Último Dia</div>
+                    <div class="dropdown-item" data-period="week">Última Semana</div>
+                    <div class="dropdown-item" data-period="month">Último Mês</div>
+                    <div class="dropdown-item" data-period="quarter">Último Trimestre</div>
+                    <div class="dropdown-item" data-period="semester">Último Semestre</div>
+                    <div class="dropdown-item" data-period="year">Último Ano</div>
+                    <div class="dropdown-item" data-period="5years">Últimos 5 Anos</div>
+                    <div class="dropdown-item" data-period="10years">Últimos 10 Anos</div>
+                </div>
+            </div>
+        </div>
+ 
+        <div class="reports-content">
+            <!-- Impacto Ambiental -->
+            <div class="carbon-impact">
+                <h3>🌍 Impacto Ambiental Equivalente</h3>
+                <div class="impact-value" id="carbonImpact">0 árvores para compensar</div>
+                <div class="impact-description" id="impactDescription">
+                    Suas emissões serão calculadas conforme você adiciona dados de atividades
+                </div>
+            </div>
+ 
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>Emissões Totais de CO₂</h3>
+                    <div class="stat-value" id="totalEmissions">0<span class="stat-unit">kg CO₂e</span></div>
+                    <div class="stat-change">Adicione dados para ver a evolução</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Média Diária</h3>
+                    <div class="stat-value" id="dailyAverage">0<span class="stat-unit">kg/dia</span></div>
+                    <div class="stat-change">Baseado no período selecionado</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Maior Fonte</h3>
+                    <div class="stat-value" id="largestSource">-</div>
+                    <div class="stat-change">Categoria com mais emissões</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Redução Necessária</h3>
+                    <div class="stat-value" id="reductionTarget">0<span class="stat-unit">%</span></div>
+                    <div class="stat-change">Para meta sustentável</div>
+                </div>
+            </div>
+ 
+            <div class="charts-container">
+                <div class="chart-card">
+                    <h2>📈 Evolução das Emissões</h2>
+                    <div class="chart-placeholder" id="timelineChart">
+                        <div>🌱</div>
+                        <div>Gráfico de emissões ao longo do tempo</div>
+                        <small>Dados aparecerão conforme preenchimento</small>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <h2>🥧 Distribuição por Categoria</h2>
+                    <div class="chart-placeholder" id="distributionChart">
+                        <div>🌍</div>
+                        <div>Fontes de emissão</div>
+                        <small>Por transporte, energia, etc.</small>
+                    </div>
+                </div>
+            </div>
+ 
+            <div class="data-table">
+                <div class="table-header">
+                    <h2>📋 Registros Detalhados de Emissões</h2>
+                </div>
+                <div id="tableContent">
+                    <div class="no-data">
+                        <div class="no-data-icon">🌿</div>
+                        <h3>Nenhum dado de emissão encontrado</h3>
+                        <p>Os registros de carbono aparecerão aqui conforme você adiciona atividades na página principal.</p>
+                        <p><small>Transporte, energia, alimentação, resíduos e outras fontes de emissão</small></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+ 
+        <div class="export-options">
+            <button class="export-btn secondary" id="exportExcel">
+                📊 Exportar para Excel
+            </button>
+            <button class="export-btn" id="exportPDF">
+                🌱 Relatório de Sustentabilidade
+            </button>
+        </div>
+    </div>
+ 
+    <script>
+        // Dados iniciais zerados para emissões de carbono
+        let carbonData = JSON.parse(localStorage.getItem('carbonEmissionsData')) || [];
+        let currentPeriod = 'month';
+ 
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeDropdown();
+            loadCarbonReport();
+        });
+ 
+        // Controle do dropdown
+        function initializeDropdown() {
+            const dropdownBtn = document.getElementById('periodDropdown');
+            const dropdownContent = document.getElementById('dropdownContent');
+ 
+            dropdownBtn.addEventListener('click', function() {
+                dropdownContent.classList.toggle('show');
+            });
+ 
+            // Fechar dropdown ao clicar fora
+            window.addEventListener('click', function(e) {
+                if (!e.target.matches('.dropdown-btn')) {
+                    if (dropdownContent.classList.contains('show')) {
+                        dropdownContent.classList.remove('show');
+                    }
+                }
+            });
+ 
+            // Seleção de período
+            const periodItems = document.querySelectorAll('.dropdown-item');
+            periodItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    const period = this.getAttribute('data-period');
+                    const periodText = this.textContent;
+                   
+                    dropdownBtn.textContent = periodText;
+                    dropdownContent.classList.remove('show');
+                   
+                    currentPeriod = period;
+                    loadCarbonReport();
+                });
+            });
+        }
+ 
+        // Carregar relatório de carbono
+        function loadCarbonReport() {
+            const filteredData = filterDataByPeriod(carbonData, currentPeriod);
+            updateCarbonStatistics(filteredData);
+            updateCarbonCharts(filteredData);
+            updateCarbonTable(filteredData);
+            updateCarbonImpact(filteredData);
+        }
+ 
+        // Filtrar dados por período
+        function filterDataByPeriod(data, period) {
+            const now = new Date();
+            let startDate = new Date();
+ 
+            switch (period) {
+                case 'day':
+                    startDate.setDate(now.getDate() - 1);
+                    break;
+                case 'week':
+                    startDate.setDate(now.getDate() - 7);
+                    break;
+                case 'month':
+                    startDate.setMonth(now.getMonth() - 1);
+                    break;
+                case 'quarter':
+                    startDate.setMonth(now.getMonth() - 3);
+                    break;
+                case 'semester':
+                    startDate.setMonth(now.getMonth() - 6);
+                    break;
+                case 'year':
+                    startDate.setFullYear(now.getFullYear() - 1);
+                    break;
+                case '5years':
+                    startDate.setFullYear(now.getFullYear() - 5);
+                    break;
+                case '10years':
+                    startDate.setFullYear(now.getFullYear() - 10);
+                    break;
+                default:
+                    startDate.setMonth(now.getMonth() - 1);
+            }
+ 
+            return data.filter(item => {
+                const itemDate = new Date(item.date);
+                return itemDate >= startDate && itemDate <= now;
+            });
+        }
+ 
+        // Atualizar estatísticas de carbono
+        function updateCarbonStatistics(data) {
+            const totalEmissions = data.reduce((sum, item) => sum + (parseFloat(item.emissions) || 0), 0);
+            const daysInPeriod = calculateDaysInPeriod(currentPeriod);
+            const dailyAverage = daysInPeriod > 0 ? totalEmissions / daysInPeriod : 0;
+           
+            // Encontrar maior fonte
+            const sources = {};
+            data.forEach(item => {
+                const category = item.category || 'Outros';
+                sources[category] = (sources[category] || 0) + (parseFloat(item.emissions) || 0);
+            });
+           
+            const largestSource = Object.keys(sources).length > 0
+                ? Object.keys(sources).reduce((a, b) => sources[a] > sources[b] ? a : b)
+                : '-';
+ 
+            // Calcular redução necessária (exemplo: meta de 2kg/dia)
+            const targetDaily = 2; // kg CO₂e/dia
+            const reductionNeeded = dailyAverage > targetDaily
+                ? Math.round(((dailyAverage - targetDaily) / dailyAverage) * 100)
+                : 0;
+ 
+            document.getElementById('totalEmissions').innerHTML = `${totalEmissions.toFixed(1)}<span class="stat-unit">kg CO₂e</span>`;
+            document.getElementById('dailyAverage').innerHTML = `${dailyAverage.toFixed(2)}<span class="stat-unit">kg/dia</span>`;
+            document.getElementById('largestSource').textContent = largestSource;
+            document.getElementById('reductionTarget').innerHTML = `${reductionNeeded}<span class="stat-unit">%</span>`;
+        }
+ 
+        // Atualizar impacto ambiental
+        function updateCarbonImpact(data) {
+            const totalEmissions = data.reduce((sum, item) => sum + (parseFloat(item.emissions) || 0), 0);
+            const treesNeeded = Math.ceil(totalEmissions / 21.77); // 1 árvore absorve ~21.77kg CO₂/ano
+           
+            const impactElement = document.getElementById('carbonImpact');
+            const descriptionElement = document.getElementById('impactDescription');
+ 
+            if (totalEmissions === 0) {
+                impactElement.textContent = "0 árvores para compensar";
+                descriptionElement.textContent = "Adicione dados de emissões para calcular o impacto ambiental";
+            } else {
+                impactElement.textContent = `${treesNeeded} árvores para compensar`;
+                descriptionElement.textContent = `Equivalente a ${(totalEmissions / 1000).toFixed(2)} toneladas de CO₂e`;
+            }
+        }
+ 
+        // Calcular dias no período
+        function calculateDaysInPeriod(period) {
+            switch (period) {
+                case 'day': return 1;
+                case 'week': return 7;
+                case 'month': return 30;
+                case 'quarter': return 90;
+                case 'semester': return 180;
+                case 'year': return 365;
+                case '5years': return 1825;
+                case '10years': return 3650;
+                default: return 30;
+            }
+        }
+ 
+        // Atualizar gráficos
+        function updateCarbonCharts(data) {
+            const timelineChart = document.getElementById('timelineChart');
+            const distributionChart = document.getElementById('distributionChart');
+ 
+            if (data.length === 0) {
+                timelineChart.innerHTML = `
+                    <div>🌱</div>
+                    <div>Gráfico de emissões ao longo do tempo</div>
+                    <small>Dados aparecerão conforme preenchimento</small>
+                `;
+                distributionChart.innerHTML = `
+                    <div>🌍</div>
+                    <div>Fontes de emissão</div>
+                    <small>Por transporte, energia, etc.</small>
+                `;
+                return;
+            }
+ 
+            timelineChart.innerHTML = `
+                <div>📈</div>
+                <div>Evolução das Emissões</div>
+                <small>${data.length} registros carregados</small>
+            `;
+           
+            distributionChart.innerHTML = `
+                <div>🥧</div>
+                <div>Distribuição por Categoria</div>
+                <small>Pronto para integração com gráficos</small>
+            `;
+        }
+ 
+        // Atualizar tabela
+        function updateCarbonTable(data) {
+            const tableContent = document.getElementById('tableContent');
+ 
+            if (data.length === 0) {
+                tableContent.innerHTML = `
+                    <div class="no-data">
+                        <div class="no-data-icon">🌿</div>
+                        <h3>Nenhum dado de emissão encontrado</h3>
+                        <p>Os registros de carbono aparecerão aqui conforme você adiciona atividades na página principal.</p>
+                        <p><small>Transporte, energia, alimentação, resíduos e outras fontes de emissão</small></p>
+                    </div>
+                `;
+                return;
+            }
+ 
+            let tableHTML = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Data</th>
+                            <th>Categoria</th>
+                            <th>Atividade</th>
+                            <th>Emissões</th>
+                            <th>Detalhes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+ 
+            data.forEach(item => {
+                const categoryClass = `badge-${item.category?.toLowerCase() || 'outros'}`;
+                tableHTML += `
+                    <tr>
+                        <td>${formatDate(item.date)}</td>
+                        <td><span class="category-badge ${categoryClass}">${item.category || 'Outros'}</span></td>
+                        <td>${item.activity || 'Atividade não especificada'}</td>
+                        <td><strong>${parseFloat(item.emissions || 0).toFixed(2)} kg CO₂e</strong></td>
+                        <td>${item.details || '-'}</td>
+                    </tr>
+                `;
+            });
+ 
+            tableHTML += `
+                    </tbody>
+                </table>
+            `;
+ 
+            tableContent.innerHTML = tableHTML;
+        }
+ 
+        // Formatar data
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('pt-BR');
+        }
+ 
+        // Exportar funcionalidades
+        document.getElementById('exportExcel').addEventListener('click', function() {
+            alert('📊 Exportando dados de emissões para Excel...');
+        });
+ 
+        document.getElementById('exportPDF').addEventListener('click', function() {
+            alert('🌱 Gerando Relatório de Sustentabilidade em PDF...');
+        });
+ 
+        // Função para atualizar dados (será chamada quando novos dados forem adicionados)
+        window.updateCarbonReports = function(newData) {
+            carbonData = newData;
+            loadCarbonReport();
+        };
+    </script>
+</body>
+</html>
+ 
