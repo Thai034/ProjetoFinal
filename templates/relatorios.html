@@ -911,22 +911,87 @@
             box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
         }
  
-        @media (max-width: 768px) {
-            .charts-container {
-                grid-template-columns: 1fr;
-            }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f0f9f0 0%, #e6f4e6 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
 
+        .reports-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 100, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        /* Cabeçalho Responsivo */
+        .reports-header {
+            background: linear-gradient(135deg, #2e7d32, #4caf50);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+            position: relative;
+        }
+
+        .reports-header h1 { font-size: 2em; margin-bottom: 10px; }
+        
+        .back-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            padding: 8px 15px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            display: inline-block;
+            margin-bottom: 10px; /* Para mobile */
+        }
+
+        /* Tabela Responsiva */
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto; /* Permite scroll horizontal no celular */
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 600px; /* Força largura mínima para ativar scroll */
+        }
+        
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e8f5e9;
+            white-space: nowrap; /* Evita quebra de texto feia na tabela */
+        }
+
+        /* Responsividade Geral */
+        @media (min-width: 768px) {
+            .reports-header .back-btn {
+                position: absolute;
+                left: 20px;
+                top: 50%;
+                transform: translateY(-50%);
+                margin-bottom: 0;
+            }
+        }
+
+        @media (max-width: 768px) {
             .stats-grid {
-                grid-template-columns: 1fr;
+                grid-template-columns: 1fr; /* Cards empilhados */
             }
-           
-            .stat-value {
-                font-size: 1.8em;
+            .charts-container {
+                grid-template-columns: 1fr; /* Gráficos empilhados */
             }
-           
             .period-selector {
                 flex-direction: column;
             }
+            .reports-header h1 { font-size: 1.5rem; }
+            .reports-content { padding: 15px; }
         }
     </style>
 </head>

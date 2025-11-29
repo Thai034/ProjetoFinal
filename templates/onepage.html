@@ -325,6 +325,10 @@
             background: linear-gradient(135deg, var(--secondary-color), #ff6d00);
         }
 
+        .btn-third {
+            background: linear-gradient(135deg, #ff2d2d, #ff0000);
+        }
+
         .btn-secondary:hover {
             box-shadow: 0 4px 12px rgba(255, 143, 0, 0.4);
         }
@@ -782,8 +786,12 @@
                             <button type="submit" class="btn">
                                 <span>🌱</span> <span id="calculate-btn-text">Calcular Emissões COP30</span>
                             </button>
-                            <button type="button" id="reset-btn" class="btn btn-secondary">
-                                <span>🔄</span> <span id="reset-btn-text">Resetar Dados</span>
+                            <button type="button" id="reset_actual-btn" class="btn btn-secondary">
+                                <span>🔄</span> <span id="reset_actual-btn-text">Resetar Conta Atual</span>
+                            </button>
+
+                            <button type="button" id="reset-btn" class="btn btn-third">
+                                <span>⚠️</span> <span id="reset-btn-text">Apagar TODOS os Dados</span>
                             </button>
                         </div>
                     </form>
@@ -1249,7 +1257,7 @@
                     scopeIndirect: "Escopo 2 - Energia Indireta",
                     scopeOther: "Escopo 3 - Outras Emissões",
                     calculateBtn: "Calcular Emissões COP30",
-                    resetBtn: "Resetar Dados",
+                    resetBtn: "Apagar TODOS os Dados",
                     loadingText: "Calculando emissões conforme padrões COP30...",
                     
                     // Outros cards
@@ -1638,10 +1646,35 @@
             }, 3000);
         }
 
+        document.getElementById('reset_actual-btn').addEventListener('click', function() {
+            if(confirm("Isso limpará os gráficos e números da tela atual, mas o histórico será mantido nos Relatórios. Deseja limpar a tela?")) {
+                // 1. Zerar KPIs na tela
+                document.getElementById('total-emissions').textContent = '0.00 tCO₂e';
+                document.getElementById('direct-emissions').textContent = '0.00 tCO₂e';
+                document.getElementById('indirect-emissions').textContent = '0.00 tCO₂e';
+                document.getElementById('other-emissions').textContent = '0.00 tCO₂e';
+
+                // 2. Zerar Arrays dos Gráficos
+                emissionData.datasets[0].data = [0, 0, 0, 0, 0];
+                scopeData.datasets[0].data = [0, 0, 0];
+
+                // 3. Atualizar Gráficos
+                emissionsChart.update();
+                scopeChart.update();
+
+                // 4. Limpar textos de análise e formulário
+                document.getElementById('impact-analysis').innerHTML = '<p id="analysis-placeholder" style="color: var(--text-light); text-align: center;">Insira dados para ver a análise.</p>';
+                document.getElementById('emission-form').reset();
+                document.getElementById('subcategory-group').style.display = 'none';
+
+                alert("Tela limpa! Seus dados anteriores continuam salvos nos Relatórios.");
+            }
+        });
+
         // Função para resetar os dados
         document.getElementById('reset-btn').addEventListener('click', async function() {
             const currentLang = document.documentElement.getAttribute('lang') || 'pt';
-            const confirmMsg = currentLang === 'pt' ? 'Tem certeza que deseja resetar todos os dados?' :
+            const confirmMsg = currentLang === 'pt' ? 'Tem certeza que deseja resetar TODOS os dados? (incluindo outras contas)' :
                               currentLang === 'en' ? 'Are you sure you want to reset all data?' :
                               '¿Está seguro de que desea restablecer todos los datos?';
             
