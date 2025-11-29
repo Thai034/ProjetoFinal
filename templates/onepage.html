@@ -67,12 +67,6 @@
             margin: 0 auto;
         }
 
-        /*
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
 
         .logo h1 {
             font-size: 1.6rem;
@@ -82,7 +76,29 @@
         .logo-icon {
             font-size: 2rem;
         }
-*/
+
+        /* Logo responsivo */
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo img {
+            height: 50px;
+            width: auto;
+            max-width: 150px;
+            object-fit: contain;
+        }
+
+        .logo h1 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
         .cop30-badge {
             background: var(--secondary-color);
             padding: 4px 12px;
@@ -459,6 +475,21 @@
             color: inherit !important;
         }
 
+        @media (max-width: 1024px) {
+            .logo h1 {
+                font-size: 1.1rem;
+            }
+            
+            .cop30-badge {
+                font-size: 0.7rem;
+                padding: 3px 8px;
+            }
+            
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
         @media (max-width: 768px) {
             .header-content {
                 flex-direction: column;
@@ -466,18 +497,49 @@
                 text-align: center;
             }
             
+            .logo {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .logo img {
+                height: 40px;
+                max-width: 120px;
+            }
+            
+            .logo h1 {
+                font-size: 0.95rem;
+                flex-direction: column;
+                align-items: center;
+            }
+            
             nav ul {
                 flex-wrap: wrap;
                 justify-content: center;
                 gap: 1rem;
+                font-size: 0.9rem;
             }
             
             .dashboard-grid {
                 grid-template-columns: 1fr;
+                gap: 1rem;
             }
             
             .kpi-grid {
                 grid-template-columns: repeat(2, 1fr);
+                gap: 0.8rem;
+            }
+            
+            .kpi-value {
+                font-size: 1.5rem;
+            }
+            
+            .kpi-label {
+                font-size: 0.8rem;
+            }
+            
+            .chart-container {
+                height: 220px;
             }
             
             .actions {
@@ -487,29 +549,120 @@
             .btn {
                 width: 100%;
                 justify-content: center;
+                padding: 0.75rem 1.2rem;
+                font-size: 0.95rem;
+            }
+            
+            .card {
+                padding: 1rem;
+            }
+            
+            .card h2 {
+                font-size: 1.1rem;
             }
             
             .language-options {
                 left: 0;
                 top: 100%;
             }
-        }
-
-        @media (max-width: 480px) {
-            .kpi-grid {
-                grid-template-columns: 1fr;
-            }
             
             main {
                 padding: 1rem;
             }
             
-            .card {
-                padding: 1.2rem;
+            .dashboard-title {
+                font-size: 1.2rem;
+            }
+            
+            .status-indicator {
+                font-size: 0.7rem;
+                padding: 3px 8px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .logo img {
+                height: 35px;
+                max-width: 100px;
+            }
+            
+            .logo h1 {
+                font-size: 0.85rem;
+            }
+            
+            .cop30-badge,
+            .status-indicator {
+                font-size: 0.65rem;
+                padding: 2px 6px;
+                margin-left: 4px;
+            }
+            
+            .kpi-grid {
+                grid-template-columns: 1fr;
             }
             
             .kpi-value {
                 font-size: 1.8rem;
+            }
+            
+            main {
+                padding: 0.75rem;
+            }
+            
+            .card {
+                padding: 0.85rem;
+            }
+            
+            .card h2 {
+                font-size: 1rem;
+            }
+            
+            input, select {
+                padding: 0.7rem;
+                font-size: 0.95rem;
+            }
+            
+            .btn {
+                padding: 0.7rem 1rem;
+                font-size: 0.9rem;
+            }
+            
+            .chart-container {
+                height: 200px;
+                padding: 0.5rem;
+            }
+            
+            .recommendations-list li {
+                padding: 0.75rem 0;
+                font-size: 0.9rem;
+            }
+            
+            .recommendation-icon {
+                font-size: 1.1rem;
+            }
+            
+            .recommendation-content h3 {
+                font-size: 0.95rem;
+            }
+            
+            .recommendation-content p {
+                font-size: 0.85rem;
+            }
+            
+            footer {
+                padding: 1.5rem 1rem;
+                font-size: 0.85rem;
+            }
+            
+            .dropdown-menu,
+            .language-options {
+                min-width: 180px;
+                font-size: 0.9rem;
+            }
+            
+            .dropdown-menu a,
+            .language-options a {
+                padding: 10px 12px;
             }
         }
     </style>
