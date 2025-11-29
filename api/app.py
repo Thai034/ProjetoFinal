@@ -63,6 +63,10 @@ def get_db_connection():
             conn_params['ssl_ca'] = _SSL_CA_PATH
             # garantir verificação de certificado
             conn_params['ssl_verify_cert'] = True
+        else:
+            # Desativar SSL se nenhum certificado for fornecido
+            conn_params.pop('ssl_ca', None)
+            conn_params.pop('ssl_verify_cert', None)
 
         conn = mysql.connector.connect(**conn_params)
         print("✅ Conexão MySQL estabelecida com sucesso!")
