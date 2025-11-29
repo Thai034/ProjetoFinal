@@ -539,6 +539,41 @@ def get_user():
         'email': session['user_email']
     })
 
+@app.route('/api/emissions/user', methods=['GET'])
+@login_required
+def get_user_emissions():
+    try:
+        conn = get_db_connection()
+        if not conn:
+            return jsonify({'error': 'Erro de conexão com o banco'}), 500
+        
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute('''
+            SELECT id, category, subcategory, quantity, unit, scope, 
+                   emissions_kg, emissions_tons, timestamp, created_at
+            FROM emissions 
+            WHERE user_id = %s 
+            ORDER BY created_at DESC
+        ''', (session['user_id'],))
+        
+        emissions = cursor.fetchall()
+        conn.close()
+        
+        # Converter datetime para string se necessário
+        for emission in emissions:
+            if emission.get('created_at'):
+                emission['created_at'] = emission['created_at'].isoformat()
+        
+        return jsonify({
+            'success': True,
+            'emissions': emissions,
+            'total': len(emissions)
+        })
+        
+    except Exception as e:
+        print(f"Erro ao buscar emissões: {e}")
+        return jsonify({'error': 'Erro ao buscar emissões'}), 500
+
 if __name__ == "__main__":
     print("🔄 Inicializando banco de dados...")
     init_db()
