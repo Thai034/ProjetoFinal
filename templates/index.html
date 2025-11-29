@@ -25,8 +25,8 @@
         }
 
         [data-theme="dark"] {
-            --primary: #1F6B41;        /* Verde mais escuro */
-            --primary-dark: #164B30;   /* Verde ainda mais escuro */
+            --primary: #1F6B41;
+            --primary-dark: #164B30;
             --secondary: #2A7BB0;
             --light: #1E1E1E;
             --dark: #F8F9FA;
@@ -40,182 +40,151 @@
             line-height: 1.6;
             background-color: var(--bg-color);
             transition: background-color 0.3s, color 0.3s;
+            padding-top: 80px; /* Espaço para o header fixo no desktop */
         }
 
-/* Header & Navigation */
-header {
-    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    position: fixed;
-    width: 100%;
-    top: 0;
-    z-index: 1000;
-    transition: background-color 0.3s;
-}
-
-/* Links de navegação - cor branca para contrastar */
-.nav-links a {
-    text-decoration: none;
-    color: white;  /* ← Mudei para branco */
-    font-weight: 500;
-    transition: color 0.3s;
-}
-
-.nav-links a:hover {
-    color: #e8f5e8;  /* ← Verde bem clarinho no hover */
-}
-
-/* Botão Entrar - cor mais clara */
-.btn-entrar {
-    display: inline-block;
-    padding: 0.5rem 1.5rem;
-    background-color: rgba(255, 255, 255, 0.2);  /* ← Verde com transparência */
-    color: white;
-    text-decoration: none;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    border-radius: 4px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.3s;
-    text-align: center;
-}
-
-.btn-entrar:hover {
-    background-color: rgba(255, 255, 255, 0.3);
-    color: white;
-    text-decoration: none;
-}
-
-/* Botão Configurações - cor mais clara */
-.btn-config {
-    background-color: rgba(255, 255, 255, 0.2);
-    color: white;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    padding: 0.5rem 1.5rem;
-    border-radius: 4px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.3s;
-}
-
-.btn-config:hover {
-    background-color: rgba(255, 255, 255, 0.3);
-}
+        /* Header & Navigation */
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
 
         .nav-container {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            height: 7rem;
-            padding: 1rem 5% 1rem 8%;
+            min-height: 5rem; /* Altura mínima, não fixa */
+            padding: 0.5rem 5%;
             max-width: 1200px;
             margin: 0 auto;
         }
 
+        /* Logo ajustada sem margens negativas perigosas */
         .logo {
+            display: flex;
+            align-items: center;
             height: 50px;
-            margin-top: -4rem;
+            text-decoration: none;
         }
 
         .logo img {
-            height: 180%;
+            height: 100%;
             width: auto;
+            max-width: 180px;
+            object-fit: contain;
         }
 
         .nav-links {
             display: flex;
             list-style: none;
-        }
-
-        .nav-links li {
-            margin-left: 2rem;
+            gap: 2rem;
+            align-items: center;
         }
 
         .nav-links a {
             text-decoration: none;
-            color: var(--text-color);
+            color: white;
             font-weight: 500;
             transition: color 0.3s;
+            white-space: nowrap;
         }
 
         .nav-links a:hover {
-            color: var(--primary);
+            color: #e8f5e8;
         }
 
+        /* Container para botões de ação */
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        /* Botões */
         .btn-entrar {
             display: inline-block;
             padding: 0.5rem 1.5rem;
-            background-color: var(--primary);
+            background-color: rgba(255, 255, 255, 0.2);
             color: white;
-            text-decoration: none; /* ← IMPORTANTE: remove sublinhado */
-            border: none;
+            text-decoration: none;
+            border: 1px solid rgba(255, 255, 255, 0.3);
             border-radius: 4px;
             font-weight: 500;
             cursor: pointer;
-            transition: background-color 0.3s;
+            transition: all 0.3s;
             text-align: center;
+            white-space: nowrap;
         }
 
         .btn-entrar:hover {
-            background-color: var(--primary-dark);
-            color: white; /* ← Garante que texto fique branco no hover */
-            text-decoration: none; /* ← Remove qualquer sublinhado no hover */
+            background-color: rgba(255, 255, 255, 0.3);
+            color: white;
+        }
+
+        .btn-config {
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 0.5rem 1.5rem;
+            border-radius: 4px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        .btn-config:hover {
+            background-color: rgba(255, 255, 255, 0.3);
         }
 
         /* Configurações Dropdown */
         .config-container {
             position: relative;
             display: inline-block;
-            margin-left: 1rem;
-        }
-
-        .btn-config {
-            background-color: var(--secondary);
-            color: white;
-            border: none;
-            padding: 0.5rem 1.5rem;
-            border-radius: 4px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        .btn-config:hover {
-            background-color: #144265;
         }
 
         .config-dropdown {
             display: none;
             position: absolute;
             right: 0;
+            top: 100%;
+            margin-top: 5px;
             background-color: var(--bg-color);
             min-width: 200px;
             box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
             border-radius: 4px;
-            z-index: 1;
+            z-index: 1001;
             padding: 1rem;
-            transition: background-color 0.3s;
+            border: 1px solid var(--gray);
         }
 
         .config-container:hover .config-dropdown {
             display: block;
         }
 
-        .theme-toggle, .language-selector {
-            margin-bottom: 1rem;
-        }
-
+        /* Conteúdo do Dropdown */
         .theme-toggle h4, .language-selector h4 {
             margin-bottom: 0.5rem;
             color: var(--text-color);
+            font-size: 0.9rem;
         }
 
-        .theme-buttons {
+        .theme-buttons, .lang-buttons {
             display: flex;
             gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .lang-buttons {
+            flex-direction: column;
         }
 
-        .theme-btn {
+        .theme-btn, .lang-btn {
             padding: 0.5rem;
             border: 1px solid var(--gray);
             background: var(--bg-color);
@@ -224,32 +193,10 @@ header {
             cursor: pointer;
             flex: 1;
             transition: all 0.3s;
+            font-size: 0.9rem;
         }
 
-        .theme-btn.active {
-            background-color: var(--primary);
-            color: white;
-            border-color: var(--primary);
-        }
-
-        .lang-buttons {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-
-        .lang-btn {
-            padding: 0.5rem;
-            border: 1px solid var(--gray);
-            background: var(--bg-color);
-            color: var(--text-color);
-            border-radius: 4px;
-            cursor: pointer;
-            transition: all 0.3s;
-            text-align: left;
-        }
-
-        .lang-btn.active {
+        .theme-btn.active, .lang-btn.active {
             background-color: var(--primary);
             color: white;
             border-color: var(--primary);
@@ -258,11 +205,12 @@ header {
         /* Hero Section */
         .hero {
             background: linear-gradient(135deg, #f5f7fa 0%, #e4efe9 100%);
-            padding: 10rem 5% 6rem;
-            text-align: center;
+            padding: 4rem 5%;
+            min-height: 80vh;
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
             align-items: center;
+            text-align: center;
         }
 
         [data-theme="dark"] .hero {
@@ -270,21 +218,23 @@ header {
         }
 
         .hero-content {
-            max-width: 400rem;
+            width: 100%;
+            max-width: 800px; /* Largura controlada */
             background-color: var(--bg-color);
-            padding: 2rem;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 3rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
         }
 
         .hero h1 {
-            font-size: 2.5rem;
+            font-size: clamp(1.8rem, 4vw, 2.5rem); /* Texto responsivo */
             margin-bottom: 1.5rem;
             color: var(--secondary);
+            line-height: 1.2;
         }
 
         .hero p {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             margin-bottom: 2rem;
             color: var(--gray);
         }
@@ -293,69 +243,62 @@ header {
             background-color: var(--secondary);
             color: white;
             border: none;
-            padding: 0.8rem 2rem;
-            border-radius: 4px;
+            padding: 1rem 2.5rem;
+            border-radius: 50px;
             font-size: 1.1rem;
-            font-weight: 500;
+            font-weight: 600;
             cursor: pointer;
-            transition: background-color 0.3s;
+            transition: transform 0.3s, background-color 0.3s;
         }
 
         .btn-saiba-mais:hover {
             background-color: #144265;
+            transform: translateY(-3px);
         }
 
         /* Sustainability Circles */
-/* Sustainability Circles - CORRIGIDO */
-.sustainability-circles {
-    display: flex;
-    justify-content: center;
-    gap: 1.5rem;
-    margin-top: 2rem;
-    flex-wrap: wrap;
-}
+        .sustainability-circles {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-top: 3rem;
+            flex-wrap: wrap;
+        }
 
-.circle-item {
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-    background-color: var(--light); /* ← CORRIGIDO: usa --light em vez de --bg-color */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
-    cursor: pointer;
-    border: 2px solid var(--primary); /* ← ADICIONADO: borda para melhor visibilidade */
-}
+        .circle-item {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background-color: var(--light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 2px solid var(--primary);
+        }
 
-.circle-item:hover {
-    transform: translateY(-10px) scale(1.1);
-    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
-    background-color: var(--primary);
-}
+        .circle-item:hover {
+            transform: translateY(-10px) scale(1.1);
+            background-color: var(--primary);
+        }
 
-.circle-item i {
-    font-size: 2rem;
-    color: var(--primary); /* ← COR DO ÍCONE */
-    transition: color 0.3s;
-}
+        .circle-item i {
+            font-size: 2rem;
+            color: var(--primary);
+            transition: color 0.3s;
+        }
 
-.circle-item:hover i {
-    color: white;
-}
+        .circle-item:hover i {
+            color: white;
+        }
 
-/* Garantir que os círculos fiquem visíveis no tema escuro */
-[data-theme="dark"] .circle-item {
-    background-color: var(--light); /* Fundo mais claro no tema escuro */
-    border-color: var(--primary); /* Borda com a cor primária */
-}
+        [data-theme="dark"] .circle-item {
+            background-color: #2d2d2d;
+        }
 
-[data-theme="dark"] .circle-item i {
-    color: var(--primary); /* Ícones na cor primária */
-}
-
-        /* Sections Common Styles */
+        /* Sections */
         section {
             padding: 5rem 5%;
             max-width: 1200px;
@@ -364,64 +307,90 @@ header {
 
         section h2 {
             font-size: 2rem;
-            margin-bottom: 2rem;
+            margin-bottom: 3rem;
             color: var(--secondary);
             text-align: center;
+            position: relative;
+        }
+        
+        section h2::after {
+            content: '';
+            display: block;
+            width: 60px;
+            height: 4px;
+            background: var(--primary);
+            margin: 10px auto 0;
+            border-radius: 2px;
         }
 
-        /* Quem Somos Section */
+        /* Quem Somos */
+        #quem-somos {
+            background: url('../static/imagens/folhasimagens.jpeg') fixed center center/cover no-repeat;
+            position: relative;
+        }
+        
+        #quem-somos::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5); /* Máscara escura para legibilidade */
+        }
+
         .quem-content {
-            max-width: 550px;
-            background-color: var(--light);
-            padding: 2rem;
+            position: relative;
+            z-index: 1;
+            max-width: 700px;
+            background-color: rgba(255, 255, 255, 0.95);
+            padding: 3rem;
             border-radius: 1rem;
             margin: 0 auto;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            overflow: auto;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        [data-theme="dark"] .quem-content {
+            background-color: rgba(30, 30, 30, 0.95);
         }
 
-        #quem-somos {
-            background: url(../static/imagens/folhasimagens.jpeg);
-            background-attachment: fixed;
-            background-repeat: no-repeat;
-            background-size: cover;
-            padding: 10rem 5% 6rem;
-            text-align: center;
-        }
-
-        #quem-somos p {
+        .quem-content p {
             margin-bottom: 1.5rem;
             font-size: 1.1rem;
             text-align: justify;
-            color: var(--text-color);
+            color: #333;
+        }
+        
+        [data-theme="dark"] .quem-content p {
+            color: #eee;
         }
 
-        /* O Que Oferecemos Section */
+        /* O Que Oferecemos */
         #o-que-oferecemos {
             background-color: var(--light);
         }
 
         .servicos-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
         }
 
         .servico-item {
             background-color: var(--bg-color);
-            padding: 1.5rem;
-            border-radius: 8px;
+            padding: 2rem;
+            border-radius: 12px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-            transition: transform 0.3s;
+            transition: transform 0.3s, box-shadow 0.3s;
+            border-top: 4px solid var(--primary);
         }
 
         .servico-item:hover {
-            transform: translateY(-5px);
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
         }
 
         .servico-item h3 {
             color: var(--primary);
-            margin-bottom: 0.5rem;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
         }
 
         /* Footer */
@@ -430,40 +399,87 @@ header {
             color: white;
             text-align: center;
             padding: 2rem;
+            margin-top: auto;
         }
 
-        /* Responsive */
-        @media (max-width: 768px) {
+        /* RESPONSIVIDADE (MOBILE) - A CORREÇÃO PRINCIPAL */
+        @media (max-width: 900px) {
+            body {
+                padding-top: 0; /* Header não é fixo ou o layout muda */
+            }
+
+            header {
+                position: relative; /* Deixa o header fluir com a página no mobile */
+            }
+
             .nav-container {
                 flex-direction: column;
                 padding: 1rem;
+                gap: 1.5rem;
             }
 
             .logo {
+                margin: 0;
+                justify-content: center;
                 height: 40px;
-                margin-right: auto;
-                margin-left: 30px;
             }
 
             .nav-links {
-                margin-bottom: 1rem;
+                flex-direction: column;
+                gap: 1rem;
+                width: 100%;
+                text-align: center;
             }
 
             .nav-links li {
-                margin: 0 0.5rem;
+                margin: 0;
             }
 
-            .hero {
-                padding: 8rem 5% 4rem;
+            .nav-actions {
                 flex-direction: column;
+                width: 100%;
+                gap: 1rem;
             }
 
+            .config-container, .btn-entrar {
+                width: 100%; /* Botões ocupam toda largura */
+            }
+
+            .btn-entrar, .btn-config {
+                display: block;
+                width: 100%;
+                text-align: center;
+            }
+
+            .config-dropdown {
+                position: static; /* Dropdown empurra o conteúdo */
+                width: 100%;
+                box-shadow: none;
+                border: 1px solid rgba(255,255,255,0.1);
+                background: rgba(0,0,0,0.05);
+                display: none; /* Mantém escondido até hover/click */
+            }
+            
+            /* Ajuste Hero Mobile */
+            .hero {
+                padding: 2rem 5%;
+            }
+            
+            .hero-content {
+                padding: 1.5rem;
+            }
+            
             .hero h1 {
-                font-size: 2rem;
+                font-size: 1.8rem;
             }
 
-            .sustainability-circles {
-                margin-top: 2rem;
+            .circle-item {
+                width: 60px;
+                height: 60px;
+            }
+            
+            .circle-item i {
+                font-size: 1.5rem;
             }
         }
     </style>
@@ -471,41 +487,43 @@ header {
 </head>
 
 <body>
-    <!-- Header & Navigation -->
     <header>
         <div class="nav-container">
             <a href="#" class="logo">
                 <img src="../static/imagens/logo-horizontal.png" alt="Ecotrace" id="logo-image">
             </a>
+            
             <ul class="nav-links">
                 <li><a href="#quem-somos" data-key="nav.about">Quem somos</a></li>
                 <li><a href="#o-que-oferecemos" data-key="nav.services">O que oferecemos</a></li>
             </ul>
-            <div class="config-container">
-                <button class="btn-config" data-key="nav.settings">Configurações</button>
-                <div class="config-dropdown">
-                    <div class="theme-toggle">
-                        <h4 data-key="settings.theme">Tema</h4>
-                        <div class="theme-buttons">
-                            <button class="theme-btn active" data-theme="light" data-key="settings.light">Claro</button>
-                            <button class="theme-btn" data-theme="dark" data-key="settings.dark">Escuro</button>
+
+            <div class="nav-actions">
+                <div class="config-container">
+                    <button class="btn-config" data-key="nav.settings">Configurações</button>
+                    <div class="config-dropdown">
+                        <div class="theme-toggle">
+                            <h4 data-key="settings.theme">Tema</h4>
+                            <div class="theme-buttons">
+                                <button class="theme-btn active" data-theme="light" data-key="settings.light">Claro</button>
+                                <button class="theme-btn" data-theme="dark" data-key="settings.dark">Escuro</button>
+                            </div>
                         </div>
-                    </div>
-                    <div class="language-selector">
-                        <h4 data-key="settings.language">Idioma</h4>
-                        <div class="lang-buttons">
-                            <button class="lang-btn active" data-lang="pt" data-key="settings.portuguese">Português</button>
-                            <button class="lang-btn" data-lang="en" data-key="settings.english">English</button>
-                            <button class="lang-btn" data-lang="es" data-key="settings.spanish">Español</button>
+                        <div class="language-selector">
+                            <h4 data-key="settings.language">Idioma</h4>
+                            <div class="lang-buttons">
+                                <button class="lang-btn active" data-lang="pt" data-key="settings.portuguese">Português</button>
+                                <button class="lang-btn" data-lang="en" data-key="settings.english">English</button>
+                                <button class="lang-btn" data-lang="es" data-key="settings.spanish">Español</button>
+                            </div>
                         </div>
                     </div>
                 </div>
+                <a href="/login" class="btn-entrar" data-key="nav.login">Entrar</a>
             </div>
-            <a href="{{url_for('login')}}" class="btn-entrar" data-key="nav.login">Entrar</a>
         </div>
     </header>
 
-    <!-- Hero Section -->
     <section class="hero">
         <div class="hero-content">
             <h1 data-key="hero.title">TRANSFORMANDO SUSTENTABILIDADE INDUSTRIAL EM RESULTADOS REAIS</h1>
@@ -513,42 +531,25 @@ header {
             <button class="btn-saiba-mais" data-key="hero.learnMore">Saiba mais</button>
             
             <div class="sustainability-circles">
-                <div class="circle-item">
-                    <i class="fas fa-leaf"></i>
-                </div>
-                <div class="circle-item">
-                    <i class="fas fa-recycle"></i>
-                </div>
-                <div class="circle-item">
-                    <i class="fas fa-solar-panel"></i>
-                </div>
-                <div class="circle-item">
-                    <i class="fas fa-water"></i>
-                </div>
-                <div class="circle-item">
-                    <i class="fas fa-wind"></i>
-                </div>
-                <div class="circle-item">
-                    <i class="fas fa-seedling"></i>
-                </div>
+                <div class="circle-item"><i class="fas fa-leaf"></i></div>
+                <div class="circle-item"><i class="fas fa-recycle"></i></div>
+                <div class="circle-item"><i class="fas fa-solar-panel"></i></div>
+                <div class="circle-item"><i class="fas fa-water"></i></div>
+                <div class="circle-item"><i class="fas fa-wind"></i></div>
+                <div class="circle-item"><i class="fas fa-seedling"></i></div>
             </div>
         </div>
     </section>
 
-    <!-- Quem Somos Section -->
     <section id="quem-somos">
         <div class="quem-content">
             <h2 data-key="about.title">QUEM SOMOS</h2>
-            <p data-key="about.text1">Somos a Ecotrace, uma plataforma que une tecnologia avançada e sustentabilidade para trazer precisão,
-                transparência e rastreabilidade à gestão ambiental industrial.</p>
-            <p data-key="about.text2">Nascemos da necessidade de trazer mais transparência, precisão e rastreabilidade aos processos que
-                impactam diretamente o consumo energético e o desempenho operacional.</p>
-            <p data-key="about.text3">Nosso compromisso é oferecer informações confiáveis e suporte estratégico, permitindo decisões mais
-                assertivas, conformidade ambiental e resultados sustentáveis de verdade.</p>
+            <p data-key="about.text1">Somos a Ecotrace, uma plataforma que une tecnologia avançada e sustentabilidade para trazer precisão, transparência e rastreabilidade à gestão ambiental industrial.</p>
+            <p data-key="about.text2">Nascemos da necessidade de trazer mais transparência, precisão e rastreabilidade aos processos que impactam diretamente o consumo energético e o desempenho operacional.</p>
+            <p data-key="about.text3">Nosso compromisso é oferecer informações confiáveis e suporte estratégico, permitindo decisões mais assertivas, conformidade ambiental e resultados sustentáveis de verdade.</p>
         </div>
     </section>
 
-    <!-- O Que Oferecemos Section -->
     <section id="o-que-oferecemos">
         <h2 data-key="services.title">O QUE OFERECEMOS</h2>
         <div class="servicos-grid">
@@ -575,7 +576,6 @@ header {
         </div>
     </section>
 
-    <!-- Footer -->
     <footer>
         <p data-key="footer.copyright">&copy; 2025 Ecotrace. Todos os direitos reservados.</p>
     </footer>
@@ -664,7 +664,7 @@ header {
                 "hero.learnMore": "Saber Más",
                 "about.title": "QUIÉNES SOMOS",
                 "about.text1": "Somos Ecotrace, una plataforma que une tecnología avanzada y sostenibilidad para aportar precisión, transparencia y trazabilidad a la gestión ambiental industrial.",
-                "about.text2": "Nacimos de la necesidad de aportar más transparencia, precisión y trazabilidad a los procesos que impactan directamente el consumo energético y el desempeño operativo.",
+                "about.text2": "Nacimos de la necesidad de aportar más transparencia, precisión y trazabilidad a los procesos que impactan directamente el consumo energético e el desempeño operativo.",
                 "about.text3": "Nuestro compromiso es ofrecer información confiable y soporte estratégico, permitiendo decisiones más asertivas, cumplimiento ambiental y resultados verdaderamente sostenibles.",
                 "services.title": "NUESTROS SERVICIOS",
                 "services.item1.title": "Cumplimiento Ambiental Automatizado",
@@ -681,91 +681,67 @@ header {
             }
         };
 
-        // Smooth scrolling para links internos
+        // Smooth scrolling
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
                 e.preventDefault();
-
                 const targetId = this.getAttribute('href');
                 if (targetId === '#') return;
-
                 const targetElement = document.querySelector(targetId);
                 if (targetElement) {
                     window.scrollTo({
-                        top: targetElement.offsetTop - 80,
+                        top: targetElement.offsetTop - 100,
                         behavior: 'smooth'
                     });
                 }
             });
         });
 
-        // Botão "Saiba Mais" sem link
+        // Botão Saiba Mais
         document.querySelector('.btn-saiba-mais').addEventListener('click', function () {
             alert('Em breve mais informações estarão disponíveis!');
         });
 
-// Tema claro/escuro
-const themeButtons = document.querySelectorAll('.theme-btn');
-themeButtons.forEach(button => {
-    button.addEventListener('click', function() {
-        const theme = this.getAttribute('data-theme');
-        document.body.setAttribute('data-theme', theme);
-        
-        // Atualizar botões ativos
-        themeButtons.forEach(btn => btn.classList.remove('active'));
-        this.classList.add('active');
-        
-        // 🔥 TROCAR A LOGO AUTOMATICAMENTE
-        const logoImage = document.getElementById('logo-image');
-        if (theme === 'dark') {
-            logoImage.src = "../static/imagens/logo-clara-horizontal.png";
-        } else {
-            logoImage.src = "../static/imagens/logo-horizontal.png";
-        }
-        
-        // Salvar preferência
-        localStorage.setItem('theme', theme);
-    });
-});
+        // Tema claro/escuro
+        const themeButtons = document.querySelectorAll('.theme-btn');
+        themeButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const theme = this.getAttribute('data-theme');
+                document.body.setAttribute('data-theme', theme);
+                themeButtons.forEach(btn => btn.classList.remove('active'));
+                this.classList.add('active');
+                
+                const logoImage = document.getElementById('logo-image');
+                if (theme === 'dark') {
+                    logoImage.src = "../static/imagens/logo-clara-horizontal.png";
+                } else {
+                    logoImage.src = "../static/imagens/logo-horizontal.png";
+                }
+                localStorage.setItem('theme', theme);
+            });
+        });
 
-// 🔥 Logo correta quando a página carrega
-const savedTheme = localStorage.getItem('theme') || 'light';
-document.body.setAttribute('data-theme', savedTheme);
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        document.body.setAttribute('data-theme', savedTheme);
+        themeButtons.forEach(btn => {
+            if (btn.getAttribute('data-theme') === savedTheme) btn.classList.add('active');
+            else btn.classList.remove('active');
+        });
+        const initialLogo = document.getElementById('logo-image');
+        if (savedTheme === 'dark') initialLogo.src = "../static/imagens/logo-clara-horizontal.png";
 
-// Ativar botão correto
-themeButtons.forEach(btn => {
-    if (btn.getAttribute('data-theme') === savedTheme) {
-        btn.classList.add('active');
-    } else {
-        btn.classList.remove('active');
-    }
-});
-
-// Aplicar logo correta ao carregar
-const initialLogo = document.getElementById('logo-image');
-if (savedTheme === 'dark') {
-    initialLogo.src = "../static/imagens/logo-clara-horizontal.png";
-}
-
-        // Sistema de idiomas
+        // Idioma
         const langButtons = document.querySelectorAll('.lang-btn');
         langButtons.forEach(button => {
             button.addEventListener('click', function() {
                 const lang = this.getAttribute('data-lang');
-                
-                // Atualizar botões ativos
                 langButtons.forEach(btn => btn.classList.remove('active'));
                 this.classList.add('active');
-                
-                // Traduzir conteúdo
                 translateContent(lang);
-                
-                // Salvar preferência
                 localStorage.setItem('language', lang);
             });
         });
 
-        // Função para traduzir conteúdo
         function translateContent(lang) {
             const elements = document.querySelectorAll('[data-key]');
             elements.forEach(element => {
@@ -780,31 +756,42 @@ if (savedTheme === 'dark') {
             });
         }
 
-        // Carregar idioma salvo
         const savedLang = localStorage.getItem('language') || 'pt';
         langButtons.forEach(btn => {
-            if (btn.getAttribute('data-lang') === savedLang) {
-                btn.classList.add('active');
-            } else {
-                btn.classList.remove('active');
-            }
+            if (btn.getAttribute('data-lang') === savedLang) btn.classList.add('active');
+            else btn.classList.remove('active');
         });
         translateContent(savedLang);
 
-        // Adicione este código no final do seu script existente
         document.addEventListener('DOMContentLoaded', function() {
             const entrarBtn = document.querySelector('.btn-entrar');
-            
             if (entrarBtn) {
                 entrarBtn.addEventListener('click', function(e) {
+                    // Se o href for apenas # ou vazio, prevenir. Se for /login, deixar ir.
+                    if(this.getAttribute('href') === '#' || !this.getAttribute('href')) {
+                        e.preventDefault();
+                        window.location.href = '/login';
+                    }
+                });
+            }
+            
+            // Suporte para mobile touch no dropdown
+            const configBtn = document.querySelector('.btn-config');
+            const configContainer = document.querySelector('.config-container');
+            
+            if(window.innerWidth <= 900) {
+                configBtn.addEventListener('click', function(e) {
                     e.preventDefault();
-                    window.location.href = '/login';
+                    e.stopPropagation();
+                    const dropdown = this.nextElementSibling;
+                    if(dropdown.style.display === 'block') {
+                        dropdown.style.display = 'none';
+                    } else {
+                        dropdown.style.display = 'block';
+                    }
                 });
             }
         });
-
-        console.log("Página carregada com sucesso.");
     </script>
 </body>
-
 </html>
