@@ -1761,7 +1761,7 @@
                 languageOptions.classList.remove('active');
             });
         }
-        
+
         // Função para carregar dados existentes do banco de dados
         async function loadExistingData() {
             try {
@@ -1913,6 +1913,8 @@
             initializeCharts();
             setupDropdowns();
             
+            await loadExistingData();
+
             console.log('🚀 EcoTrace Dashboard inicializado');
         }
 
