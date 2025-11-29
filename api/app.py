@@ -11,10 +11,9 @@ import secrets
 # Atualizar o caminho para os templates e arquivos estáticos
 app = Flask(
     __name__,
-    template_folder="../templates",  # Caminho relativo para a pasta de templates
-    static_folder="../static"       # Caminho relativo para a pasta de arquivos estáticos
+    template_folder="../templates",
+    static_folder="../static"
 )
-# Use SECRET_KEY from env when disponível (importante para Vercel/serverless)
 app.secret_key = os.environ.get('SECRET_KEY', 'sua_chave_secreta_muito_segura_aqui_ecotrace_2025')
 CORS(app)
 
@@ -28,64 +27,141 @@ MYSQL_CONFIG = {
     'connect_timeout': int(os.environ.get('AIVEN_TIMEOUT', '10')),
 }
 
-# Caminho temporário para o certificado CA quando fornecido via env
+# Caminho temporário para o certificado CA
 _SSL_CA_PATH = None
+_DB_INITIALIZED = False
 
-# Função para conectar ao MySQL (com suporte opcional a SSL CA)
-def get_db_connection():
+# Função para conectar ao MySQL
+def get_db_connection(use_database=True):
     global _SSL_CA_PATH
     try:
-        # Construir os parâmetros de conexão dinamicamente
         conn_params = dict(MYSQL_CONFIG)
+        
+        # Remover database se não for usar
+        if not use_database:
+            conn_params.pop('database', None)
 
-        # Suporte a certificado CA vindo de variável de ambiente (AIVEN_SSL_CA).
-        # A variável pode conter o PEM completo ou um conteúdo Base64 do PEM.
+        # Suporte a certificado CA
         ssl_ca_env = os.environ.get('AIVEN_SSL_CA') or os.environ.get('MYSQL_SSL_CA')
         if ssl_ca_env:
             if _SSL_CA_PATH is None:
                 import tempfile, base64
-                # Detectar se é PEM direto
                 pem_data = ssl_ca_env
                 if '-----BEGIN CERTIFICATE-----' not in pem_data:
                     try:
-                        # tentar decodificar Base64
                         pem_data = base64.b64decode(ssl_ca_env).decode('utf-8')
                     except Exception:
-                        # se falhar, manter como veio (provavelmente inválido)
                         pem_data = ssl_ca_env
-                # gravar em arquivo temporário persistente para múltiplas chamadas
                 tmp = tempfile.NamedTemporaryFile(delete=False, suffix='.pem')
                 tmp.write(pem_data.encode('utf-8'))
                 tmp.flush()
                 tmp.close()
                 _SSL_CA_PATH = tmp.name
-            # passar ssl_ca para o conector MySQL
             conn_params['ssl_ca'] = _SSL_CA_PATH
-            # garantir verificação de certificado
             conn_params['ssl_verify_cert'] = True
         else:
-            # Desativar SSL se nenhum certificado for fornecido
             conn_params.pop('ssl_ca', None)
             conn_params.pop('ssl_verify_cert', None)
 
         conn = mysql.connector.connect(**conn_params)
-        print("✅ Conexão MySQL estabelecida com sucesso!")
         return conn
     except mysql.connector.Error as e:
         print(f"❌ Erro ao conectar com MySQL: {e}")
         return None
 
-# Sistema de hash de senha simplificado
+# Sistema de hash de senha
 def hash_password(password):
-    """Cria hash da senha usando SHA-256 com salt"""
-    salt = "ecotrace_salt_2025_cop30"  # Você pode mudar este salt
+    salt = "ecotrace_salt_2025_cop30"
     return hashlib.sha256((password + salt).encode()).hexdigest()
 
 def verify_password(password, hashed):
-    """Verifica se a senha corresponde ao hash"""
     return hash_password(password) == hashed
 
-# Fatores de emissão atualizados conforme COP30 2025
+# Função para inicializar banco de dados (com tratamento de erros melhorado)
+def init_db():
+    global _DB_INITIALIZED
+    
+    if _DB_INITIALIZED:
+        return True
+    
+    try:
+        print("🔄 Verificando/criando banco de dados...")
+        
+        # Conectar sem especificar database
+        conn = get_db_connection(use_database=False)
+        if not conn:
+            print("❌ Não foi possível conectar ao MySQL")
+            return False
+            
+        cursor = conn.cursor()
+
+        # Criar banco de dados se não existir
+        database_name = MYSQL_CONFIG['database']
+        cursor.execute(f"CREATE DATABASE IF NOT EXISTS `{database_name}`")
+        print(f"✅ Banco de dados '{database_name}' verificado/criado")
+
+        # Usar o banco de dados
+        cursor.execute(f"USE `{database_name}`")
+
+        # Criar tabela de usuários
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS usuarios (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                nome VARCHAR(100) NOT NULL,
+                email VARCHAR(100) UNIQUE NOT NULL,
+                senha VARCHAR(255) NOT NULL,
+                data_cadastro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                INDEX idx_email (email)
+            )
+        ''')
+        print("✅ Tabela 'usuarios' verificada/criada")
+
+        # Criar tabela de emissões
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS emissions (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                user_id INT NOT NULL,
+                category TEXT NOT NULL,
+                subcategory TEXT,
+                quantity DECIMAL(15,2) NOT NULL,
+                unit VARCHAR(50) NOT NULL,
+                scope VARCHAR(50) NOT NULL,
+                emissions_kg DECIMAL(15,2) NOT NULL,
+                emissions_tons DECIMAL(15,4) NOT NULL,
+                timestamp VARCHAR(50) NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (user_id) REFERENCES usuarios(id) ON DELETE CASCADE,
+                INDEX idx_user_id (user_id)
+            )
+        ''')
+        print("✅ Tabela 'emissions' verificada/criada")
+
+        conn.commit()
+        conn.close()
+        
+        _DB_INITIALIZED = True
+        print("✅ Banco de dados inicializado com sucesso!")
+        return True
+        
+    except mysql.connector.Error as e:
+        print(f"❌ Erro ao inicializar banco de dados: {e}")
+        if conn:
+            conn.close()
+        return False
+    except Exception as e:
+        print(f"❌ Erro inesperado ao inicializar banco: {e}")
+        if conn:
+            conn.close()
+        return False
+
+# Middleware para garantir que o DB está inicializado
+@app.before_request
+def ensure_db_initialized():
+    global _DB_INITIALIZED
+    if not _DB_INITIALIZED:
+        init_db()
+
+# Fatores de emissão
 class CarbonCalculator:
     def __init__(self):
         self.emission_factors = {
@@ -214,61 +290,7 @@ class CarbonCalculator:
 # Inicializar calculadora
 calculator = CarbonCalculator()
 
-# Inicializar banco de dados
-def init_db():
-    try:
-        # Conectar ao MySQL sem especificar o banco de dados
-        conn = mysql.connector.connect(
-            host=MYSQL_CONFIG['host'],
-            user=MYSQL_CONFIG['user'],
-            password=MYSQL_CONFIG['password'],
-            port=MYSQL_CONFIG['port']
-        )
-        cursor = conn.cursor()
-
-        # Criar o banco de dados, se não existir
-        database_name = MYSQL_CONFIG['database']
-        cursor.execute(f"CREATE DATABASE IF NOT EXISTS {database_name}")
-        print(f"✅ Banco de dados '{database_name}' verificado/criado com sucesso!")
-
-        # Usar o banco de dados
-        cursor.execute(f"USE {database_name}")
-
-        # Criar tabela de usuários
-        cursor.execute('''
-            CREATE TABLE IF NOT EXISTS usuarios (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                nome VARCHAR(100) NOT NULL,
-                email VARCHAR(100) UNIQUE NOT NULL,
-                senha VARCHAR(255) NOT NULL,
-                data_cadastro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            )
-        ''')
-
-        # Criar tabela de emissões
-        cursor.execute('''
-            CREATE TABLE IF NOT EXISTS emissions (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                user_id INT,
-                category TEXT NOT NULL,
-                subcategory TEXT,
-                quantity REAL NOT NULL,
-                unit TEXT NOT NULL,
-                scope TEXT NOT NULL,
-                emissions_kg REAL NOT NULL,
-                emissions_tons REAL NOT NULL,
-                timestamp TEXT NOT NULL,
-                FOREIGN KEY (user_id) REFERENCES usuarios(id) ON DELETE CASCADE
-            )
-        ''')
-
-        conn.commit()
-        conn.close()
-        print("✅ Tabelas inicializadas com sucesso!")
-    except mysql.connector.Error as e:
-        print(f"❌ Erro ao inicializar banco de dados: {e}")
-
-# Middleware para verificar se usuário está logado
+# Middleware para verificar login
 def login_required(f):
     from functools import wraps
     @wraps(f)
@@ -281,23 +303,23 @@ def login_required(f):
 # Rotas da aplicação
 @app.route('/')
 def index():
-    return render_template("index.html")  
+    return render_template("index.html")
 
 @app.route('/onepage')
 @login_required
 def onepage():
-    return render_template("onepage.html")  
+    return render_template("onepage.html")
 
 @app.route('/login')
 def login():
     if 'user_id' in session:
         return redirect('/onepage')
-    return render_template("login.html") 
+    return render_template("login.html")
 
 @app.route('/relatorios')
 @login_required
 def relatorios():
-    return render_template("relatorios.html")  
+    return render_template("relatorios.html")
 
 @app.route('/logout')
 def logout():
@@ -309,7 +331,7 @@ def logout():
 def register():
     try:
         data = request.get_json()
-        print("📥 Dados recebidos para registro:", data)  # Log dos dados recebidos
+        print("📥 Dados recebidos para registro:", data)
         
         if not data:
             return jsonify({'success': False, 'message': 'Dados inválidos'}), 400
@@ -323,22 +345,27 @@ def register():
         email = data['email'].strip()
         senha = data['senha'].strip()
         
+        # Garantir que o DB está inicializado
+        if not _DB_INITIALIZED:
+            if not init_db():
+                return jsonify({'success': False, 'message': 'Erro ao inicializar banco de dados'}), 500
+        
         # Verificar se email já existe
         conn = get_db_connection()
         if not conn:
-            print("❌ Erro ao conectar com o banco de dados")  # Log de erro de conexão
+            print("❌ Erro ao conectar com o banco de dados")
             return jsonify({'success': False, 'message': 'Erro de conexão com o banco'}), 500
             
         cursor = conn.cursor()
         cursor.execute('SELECT id FROM usuarios WHERE email = %s', (email,))
         if cursor.fetchone():
             conn.close()
-            print("⚠️ Email já cadastrado:", email)  # Log de email duplicado
+            print("⚠️ Email já cadastrado:", email)
             return jsonify({'success': False, 'message': 'Email já cadastrado'}), 400
         
         # Hash da senha
         senha_hash = hash_password(senha)
-        print("🔒 Hash da senha gerado com sucesso")  # Log do hash da senha
+        print("🔒 Hash da senha gerado com sucesso")
         
         # Inserir usuário
         try:
@@ -346,15 +373,15 @@ def register():
                 'INSERT INTO usuarios (nome, email, senha) VALUES (%s, %s, %s)',
                 (nome, email, senha_hash)
             )
-            conn.commit()  # Certificar que as alterações são salvas
+            conn.commit()
             user_id = cursor.lastrowid
-            print("✅ Usuário cadastrado com sucesso, ID:", user_id)  # Log de sucesso
+            print("✅ Usuário cadastrado com sucesso, ID:", user_id)
         except Exception as e:
-            conn.rollback()  # Reverter alterações em caso de erro
-            print(f"❌ Erro ao inserir usuário no banco: {e}")  # Log detalhado do erro
-            return jsonify({'success': False, 'message': 'Erro ao salvar usuário no banco de dados'}), 500
+            conn.rollback()
+            print(f"❌ Erro ao inserir usuário no banco: {e}")
+            return jsonify({'success': False, 'message': 'Erro ao salvar usuário'}), 500
         finally:
-            conn.close()  # Garantir que a conexão seja fechada
+            conn.close()
         
         # Logar usuário automaticamente
         session['user_id'] = user_id
@@ -368,7 +395,7 @@ def register():
         })
         
     except Exception as e:
-        print(f"❌ Erro inesperado no registro: {e}")  # Log de erro inesperado
+        print(f"❌ Erro inesperado no registro: {e}")
         return jsonify({'success': False, 'message': 'Erro interno do servidor'}), 500
 
 @app.route('/api/login', methods=['POST'])
@@ -398,7 +425,7 @@ def login_api():
         conn.close()
         
         if not usuario:
-            return jsonify({'success': False, 'message': 'Email não cadastrado. Faça seu cadastro primeiro.'}), 400
+            return jsonify({'success': False, 'message': 'Email não cadastrado'}), 400
         
         # Verificar senha
         if verify_password(senha, usuario['senha']):
@@ -441,7 +468,7 @@ def calculate_emissions():
             scope=data['scope']
         )
         
-        # Salvar no banco com user_id
+        # Salvar no banco
         conn = get_db_connection()
         if conn:
             cursor = conn.cursor()
@@ -473,12 +500,21 @@ def calculate_emissions():
 
 @app.route('/api/health', methods=['GET'])
 def health_check():
+    db_status = "OK" if _DB_INITIALIZED else "NOT_INITIALIZED"
     conn = get_db_connection()
     if conn:
         conn.close()
-        return jsonify({'status': 'OK', 'message': 'API e MySQL funcionando'})
+        return jsonify({
+            'status': 'OK', 
+            'message': 'API e MySQL funcionando',
+            'db_initialized': _DB_INITIALIZED
+        })
     else:
-        return jsonify({'status': 'ERROR', 'message': 'Erro na conexão MySQL'}), 500
+        return jsonify({
+            'status': 'ERROR', 
+            'message': 'Erro na conexão MySQL',
+            'db_initialized': _DB_INITIALIZED
+        }), 500
 
 @app.route('/api/reset', methods=['POST'])
 @login_required
@@ -504,11 +540,8 @@ def get_user():
     })
 
 if __name__ == "__main__":
-    # Inicializar banco na primeira execução local
     print("🔄 Inicializando banco de dados...")
     init_db()
     print("🚀 Servidor Flask iniciando...")
-    # Quando estiver em Vercel (ou outro ambiente serverless) a variável VERCEL estará presente.
-    # Evitar chamar app.run no serverless; o runtime do Vercel importa o `app`.
     if os.environ.get('VERCEL') is None:
         app.run(debug=True, host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
