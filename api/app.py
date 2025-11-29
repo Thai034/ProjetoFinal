@@ -445,6 +445,11 @@ def login_api():
         print(f"Erro no login: {e}")
         return jsonify({'success': False, 'message': 'Erro interno do servidor'}), 500
 
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect('/login')
+
 # API de Emissões
 @app.route('/api/calculate', methods=['POST'])
 @login_required
