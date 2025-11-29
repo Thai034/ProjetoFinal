@@ -404,46 +404,77 @@
         const registerToggle = document.getElementById('register-toggle');
         const loginForm = document.getElementById('login-form');
         const registerForm = document.getElementById('register-form');
-       
+        
         loginToggle.addEventListener('click', () => {
             loginToggle.classList.add('active');
             registerToggle.classList.remove('active');
             loginForm.classList.add('active');
             registerForm.classList.remove('active');
         });
-       
+        
         registerToggle.addEventListener('click', () => {
             registerToggle.classList.add('active');
             loginToggle.classList.remove('active');
             registerForm.classList.add('active');
             loginForm.classList.remove('active');
         });
-       
-        // Validação básica dos formulários
-        loginForm.addEventListener('submit', (e) => {
+
+        // Submeter formulário de login
+        loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = document.getElementById('login-email').value;
             const password = document.getElementById('login-password').value;
-           
-            if(email && password) {
-                alert('Login realizado com sucesso!');
-                // Aqui você adicionaria a lógica de autenticação real
+
+            if (email && password) {
+                try {
+                    const response = await fetch('/api/login', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email, senha: password })
+                    });
+                    const result = await response.json();
+                    if (result.success) {
+                        alert(result.message);
+                        window.location.href = '/onepage';
+                    } else {
+                        alert(result.message);
+                    }
+                } catch (error) {
+                    console.error('Erro ao fazer login:', error);
+                    alert('Erro ao conectar com o servidor.');
+                }
             } else {
                 alert('Por favor, preencha todos os campos.');
             }
         });
-       
-        registerForm.addEventListener('submit', (e) => {
+
+        // Submeter formulário de cadastro
+        registerForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const name = document.getElementById('register-name').value;
             const email = document.getElementById('register-email').value;
             const password = document.getElementById('register-password').value;
             const confirm = document.getElementById('register-confirm').value;
-           
-            if(name && email && password && confirm) {
-                if(password === confirm) {
-                    alert('Cadastro realizado com sucesso!');
-                    // Aqui você adicionaria a lógica de registro real
+
+            if (name && email && password && confirm) {
+                if (password === confirm) {
+                    try {
+                        const response = await fetch('/api/register', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ nome: name, email, senha: password })
+                        });
+                        const result = await response.json();
+                        if (result.success) {
+                            alert(result.message);
+                            window.location.href = '/login';
+                        } else {
+                            alert(result.message);
+                        }
+                    } catch (error) {
+                        console.error('Erro ao fazer cadastro:', error);
+                        alert('Erro ao conectar com o servidor.');
+                    }
                 } else {
                     alert('As senhas não coincidem.');
                 }
@@ -454,4 +485,3 @@
     </script>
 </body>
 </html>
- 
