@@ -8,7 +8,12 @@ from typing import Dict, List, Optional
 import hashlib
 import secrets
 
-app = Flask(__name__)
+# Atualizar o caminho para os templates e arquivos estáticos
+app = Flask(
+    __name__,
+    template_folder="../templates",  # Caminho relativo para a pasta de templates
+    static_folder="../static"       # Caminho relativo para a pasta de arquivos estáticos
+)
 # Use SECRET_KEY from env when disponível (importante para Vercel/serverless)
 app.secret_key = os.environ.get('SECRET_KEY', 'sua_chave_secreta_muito_segura_aqui_ecotrace_2025')
 CORS(app)
