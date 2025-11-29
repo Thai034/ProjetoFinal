@@ -216,11 +216,25 @@ calculator = CarbonCalculator()
 
 # Inicializar banco de dados
 def init_db():
-    conn = get_db_connection()
-    if conn:
+    try:
+        # Conectar ao MySQL sem especificar o banco de dados
+        conn = mysql.connector.connect(
+            host=MYSQL_CONFIG['host'],
+            user=MYSQL_CONFIG['user'],
+            password=MYSQL_CONFIG['password'],
+            port=MYSQL_CONFIG['port']
+        )
         cursor = conn.cursor()
-        
-        # Tabela de usuários
+
+        # Criar o banco de dados, se não existir
+        database_name = MYSQL_CONFIG['database']
+        cursor.execute(f"CREATE DATABASE IF NOT EXISTS {database_name}")
+        print(f"✅ Banco de dados '{database_name}' verificado/criado com sucesso!")
+
+        # Usar o banco de dados
+        cursor.execute(f"USE {database_name}")
+
+        # Criar tabela de usuários
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS usuarios (
                 id INT AUTO_INCREMENT PRIMARY KEY,
@@ -230,8 +244,8 @@ def init_db():
                 data_cadastro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         ''')
-        
-        # Tabela de emissões
+
+        # Criar tabela de emissões
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS emissions (
                 id INT AUTO_INCREMENT PRIMARY KEY,
@@ -247,12 +261,12 @@ def init_db():
                 FOREIGN KEY (user_id) REFERENCES usuarios(id) ON DELETE CASCADE
             )
         ''')
-        
+
         conn.commit()
         conn.close()
-        print("✅ Banco de dados inicializado com sucesso!")
-    else:
-        print("❌ Erro ao inicializar banco de dados")
+        print("✅ Tabelas inicializadas com sucesso!")
+    except mysql.connector.Error as e:
+        print(f"❌ Erro ao inicializar banco de dados: {e}")
 
 # Middleware para verificar se usuário está logado
 def login_required(f):
@@ -295,6 +309,7 @@ def logout():
 def register():
     try:
         data = request.get_json()
+        print("📥 Dados recebidos para registro:", data)  # Log dos dados recebidos
         
         if not data:
             return jsonify({'success': False, 'message': 'Dados inválidos'}), 400
@@ -311,16 +326,19 @@ def register():
         # Verificar se email já existe
         conn = get_db_connection()
         if not conn:
+            print("❌ Erro ao conectar com o banco de dados")  # Log de erro de conexão
             return jsonify({'success': False, 'message': 'Erro de conexão com o banco'}), 500
             
         cursor = conn.cursor()
         cursor.execute('SELECT id FROM usuarios WHERE email = %s', (email,))
         if cursor.fetchone():
             conn.close()
+            print("⚠️ Email já cadastrado:", email)  # Log de email duplicado
             return jsonify({'success': False, 'message': 'Email já cadastrado'}), 400
         
         # Hash da senha
         senha_hash = hash_password(senha)
+        print("🔒 Hash da senha gerado com sucesso")  # Log do hash da senha
         
         # Inserir usuário
         try:
@@ -330,9 +348,10 @@ def register():
             )
             conn.commit()  # Certificar que as alterações são salvas
             user_id = cursor.lastrowid
+            print("✅ Usuário cadastrado com sucesso, ID:", user_id)  # Log de sucesso
         except Exception as e:
             conn.rollback()  # Reverter alterações em caso de erro
-            print(f"Erro ao inserir usuário: {e}")
+            print(f"❌ Erro ao inserir usuário no banco: {e}")  # Log detalhado do erro
             return jsonify({'success': False, 'message': 'Erro ao salvar usuário no banco de dados'}), 500
         finally:
             conn.close()  # Garantir que a conexão seja fechada
@@ -349,7 +368,7 @@ def register():
         })
         
     except Exception as e:
-        print(f"Erro no registro: {e}")
+        print(f"❌ Erro inesperado no registro: {e}")  # Log de erro inesperado
         return jsonify({'success': False, 'message': 'Erro interno do servidor'}), 500
 
 @app.route('/api/login', methods=['POST'])
