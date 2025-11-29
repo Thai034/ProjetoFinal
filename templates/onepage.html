@@ -1761,6 +1761,149 @@
                 languageOptions.classList.remove('active');
             });
         }
+        
+        // Função para carregar dados existentes do banco de dados
+        async function loadExistingData() {
+            try {
+                const response = await fetch('/api/emissions/summary');
+                
+                if (!response.ok) {
+                    console.log('Nenhum dado existente ou erro ao carregar');
+                    return;
+                }
+                
+                const data = await response.json();
+                
+                if (data.success && data.totals) {
+                    // Atualizar KPIs
+                    document.getElementById('total-emissions').textContent = 
+                        data.totals.total.toFixed(2) + ' tCO₂e';
+                    document.getElementById('direct-emissions').textContent = 
+                        data.totals.direct.toFixed(2) + ' tCO₂e';
+                    document.getElementById('indirect-emissions').textContent = 
+                        data.totals.indirect.toFixed(2) + ' tCO₂e';
+                    document.getElementById('other-emissions').textContent = 
+                        data.totals.other.toFixed(2) + ' tCO₂e';
+                    
+                    // Atualizar gráfico de categorias
+                    if (data.by_category) {
+                        emissionData.datasets[0].data = [
+                            data.by_category.energy || 0,
+                            data.by_category.transport || 0,
+                            data.by_category.materials || 0,
+                            data.by_category.waste || 0,
+                            data.by_category.water || 0
+                        ];
+                        if (emissionsChart) {
+                            emissionsChart.update();
+                        }
+                    }
+                    
+                    // Atualizar gráfico de escopos
+                    if (data.by_scope) {
+                        scopeData.datasets[0].data = [
+                            data.by_scope.direct || 0,
+                            data.by_scope.indirect || 0,
+                            data.by_scope.other || 0
+                        ];
+                        if (scopeChart) {
+                            scopeChart.update();
+                        }
+                    }
+                    
+                    // Atualizar análise de impacto se houver dados
+                    if (data.totals.total > 0) {
+                        updateImpactAnalysisFromTotal(data.totals.total);
+                    }
+                    
+                    console.log('✅ Dados carregados do banco de dados');
+                }
+            } catch (error) {
+                console.error('Erro ao carregar dados existentes:', error);
+            }
+        }
+
+        // Função para atualizar análise de impacto baseado no total
+        function updateImpactAnalysisFromTotal(totalTons) {
+            const impactElement = document.getElementById('impact-analysis');
+            const currentLang = document.documentElement.getAttribute('lang') || 'pt';
+            
+            const impactTexts = {
+                pt: {
+                    summary: "RESUMO GERAL DAS EMISSÕES",
+                    totalEmissions: "Total de Emissões Acumuladas",
+                    highDesc: "Volume significativo de emissões registradas no sistema.",
+                    moderateDesc: "Volume moderado de emissões monitoradas.",
+                    lowDesc: "Emissões controladas dentro de limites aceitáveis.",
+                    actionHigh: "Continue monitorando e implemente medidas de redução.",
+                    actionModerate: "Mantenha o registro contínuo das atividades.",
+                    actionLow: "Continue o excelente trabalho de monitoramento.",
+                    recommendedAction: "Ação Recomendada:"
+                },
+                en: {
+                    summary: "OVERALL EMISSIONS SUMMARY",
+                    totalEmissions: "Total Accumulated Emissions",
+                    highDesc: "Significant volume of emissions registered in the system.",
+                    moderateDesc: "Moderate volume of monitored emissions.",
+                    lowDesc: "Controlled emissions within acceptable limits.",
+                    actionHigh: "Continue monitoring and implement reduction measures.",
+                    actionModerate: "Maintain continuous activity recording.",
+                    actionLow: "Continue the excellent monitoring work.",
+                    recommendedAction: "Recommended Action:"
+                },
+                es: {
+                    summary: "RESUMEN GENERAL DE EMISIONES",
+                    totalEmissions: "Total de Emisiones Acumuladas",
+                    highDesc: "Volumen significativo de emisiones registradas en el sistema.",
+                    moderateDesc: "Volumen moderado de emisiones monitoreadas.",
+                    lowDesc: "Emisiones controladas dentro de límites aceptables.",
+                    actionHigh: "Continúe monitoreando e implemente medidas de reducción.",
+                    actionModerate: "Mantenga el registro continuo de actividades.",
+                    actionLow: "Continúe el excelente trabajo de monitoreo.",
+                    recommendedAction: "Acción Recomendada:"
+                }
+            };
+            
+            const texts = impactTexts[currentLang];
+            let impactText = '';
+            
+            if (totalTons > 50) {
+                impactText = `
+                    <div class="impact-content" style="background: #ffebee; padding: 1rem; border-radius: 8px; border-left: 4px solid #c62828;">
+                        <h3 style="color: #c62828; margin-bottom: 0.5rem;">
+                            📊 ${texts.summary}
+                        </h3>
+                        <p><strong>${texts.totalEmissions}:</strong> <span style="font-size: 1.2em; color: #c62828;">${totalTons.toFixed(2)} tCO₂e</span></p>
+                        <p>${texts.highDesc}</p>
+                        <p style="margin-top: 0.5rem;"><strong>${texts.recommendedAction}</strong> ${texts.actionHigh}</p>
+                    </div>
+                `;
+            } else if (totalTons > 10) {
+                impactText = `
+                    <div class="impact-content" style="background: #fff3e0; padding: 1rem; border-radius: 8px; border-left: 4px solid #ef6c00;">
+                        <h3 style="color: #ef6c00; margin-bottom: 0.5rem;">
+                            📊 ${texts.summary}
+                        </h3>
+                        <p><strong>${texts.totalEmissions}:</strong> <span style="font-size: 1.2em; color: #ef6c00;">${totalTons.toFixed(2)} tCO₂e</span></p>
+                        <p>${texts.moderateDesc}</p>
+                        <p style="margin-top: 0.5rem;"><strong>${texts.recommendedAction}</strong> ${texts.actionModerate}</p>
+                    </div>
+                `;
+            } else {
+                impactText = `
+                    <div class="impact-content" style="background: #e8f5e9; padding: 1rem; border-radius: 8px; border-left: 4px solid #2e7d32;">
+                        <h3 style="color: #2e7d32; margin-bottom: 0.5rem;">
+                            📊 ${texts.summary}
+                        </h3>
+                        <p><strong>${texts.totalEmissions}:</strong> <span style="font-size: 1.2em; color: #2e7d32;">${totalTons.toFixed(2)} tCO₂e</span></p>
+                        <p>${texts.lowDesc}</p>
+                        <p style="margin-top: 0.5rem;"><strong>${texts.recommendedAction}</strong> ${texts.actionLow}</p>
+                    </div>
+                `;
+            }
+            
+            impactElement.innerHTML = impactText;
+        }
 
         // Inicializar aplicação
         async function initializeApp() {

@@ -574,6 +574,67 @@ def get_user_emissions():
         print(f"Erro ao buscar emissões: {e}")
         return jsonify({'error': 'Erro ao buscar emissões'}), 500
 
+@app.route('/api/emissions/summary', methods=['GET'])
+@login_required
+def get_emissions_summary():
+    try:
+        conn = get_db_connection()
+        if not conn:
+            return jsonify({'error': 'Erro de conexão com o banco'}), 500
+        
+        cursor = conn.cursor(dictionary=True)
+        
+        # Total de emissões
+        cursor.execute('''
+            SELECT 
+                SUM(emissions_tons) as total_emissions,
+                SUM(CASE WHEN scope = 'direct' THEN emissions_tons ELSE 0 END) as direct_emissions,
+                SUM(CASE WHEN scope = 'indirect' THEN emissions_tons ELSE 0 END) as indirect_emissions,
+                SUM(CASE WHEN scope = 'other' THEN emissions_tons ELSE 0 END) as other_emissions
+            FROM emissions 
+            WHERE user_id = %s
+        ''', (session['user_id'],))
+        
+        totals = cursor.fetchone()
+        
+        # Emissões por categoria
+        cursor.execute('''
+            SELECT category, SUM(emissions_tons) as total
+            FROM emissions 
+            WHERE user_id = %s
+            GROUP BY category
+        ''', (session['user_id'],))
+        
+        by_category = cursor.fetchall()
+        
+        # Emissões por escopo
+        cursor.execute('''
+            SELECT scope, SUM(emissions_tons) as total
+            FROM emissions 
+            WHERE user_id = %s
+            GROUP BY scope
+        ''', (session['user_id'],))
+        
+        by_scope = cursor.fetchall()
+        
+        conn.close()
+        
+        return jsonify({
+            'success': True,
+            'totals': {
+                'total': float(totals['total_emissions'] or 0),
+                'direct': float(totals['direct_emissions'] or 0),
+                'indirect': float(totals['indirect_emissions'] or 0),
+                'other': float(totals['other_emissions'] or 0)
+            },
+            'by_category': {item['category']: float(item['total']) for item in by_category},
+            'by_scope': {item['scope']: float(item['total']) for item in by_scope}
+        })
+        
+    except Exception as e:
+        print(f"Erro ao buscar resumo: {e}")
+        return jsonify({'error': 'Erro ao buscar resumo'}), 500
+
 if __name__ == "__main__":
     print("🔄 Inicializando banco de dados...")
     init_db()
