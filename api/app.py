@@ -321,11 +321,6 @@ def login():
 def relatorios():
     return render_template("relatorios.html")
 
-@app.route('/logout')
-def logout():
-    session.clear()
-    return redirect('/')
-
 # API de Autenticação
 @app.route('/api/register', methods=['POST'])
 def register():
