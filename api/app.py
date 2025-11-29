@@ -263,23 +263,23 @@ def login_required(f):
 # Rotas da aplicação
 @app.route('/')
 def index():
-    return render_template("index.html")
+    return render_template("index.html")  
 
 @app.route('/onepage')
 @login_required
 def onepage():
-    return render_template("onepage.html")
+    return render_template("onepage.html")  
 
 @app.route('/login')
 def login():
     if 'user_id' in session:
         return redirect('/onepage')
-    return render_template("login.html")
+    return render_template("login.html") 
 
 @app.route('/relatorios')
 @login_required
 def relatorios():
-    return render_template("relatorios.html")
+    return render_template("relatorios.html")  
 
 @app.route('/logout')
 def logout():
@@ -297,12 +297,12 @@ def register():
         
         required_fields = ['nome', 'email', 'senha']
         for field in required_fields:
-            if field not in data:
+            if field not in data or not data[field].strip():
                 return jsonify({'success': False, 'message': f'Campo obrigatório: {field}'}), 400
         
-        nome = data['nome']
-        email = data['email']
-        senha = data['senha']
+        nome = data['nome'].strip()
+        email = data['email'].strip()
+        senha = data['senha'].strip()
         
         # Verificar se email já existe
         conn = get_db_connection()
@@ -352,11 +352,11 @@ def login_api():
         
         required_fields = ['email', 'senha']
         for field in required_fields:
-            if field not in data:
+            if field not in data or not data[field].strip():
                 return jsonify({'success': False, 'message': f'Campo obrigatório: {field}'}), 400
         
-        email = data['email']
-        senha = data['senha']
+        email = data['email'].strip()
+        senha = data['senha'].strip()
         
         # Buscar usuário
         conn = get_db_connection()
