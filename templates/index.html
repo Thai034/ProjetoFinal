@@ -25,8 +25,8 @@
         }
 
         [data-theme="dark"] {
-            --primary: #3DA56C;
-            --primary-dark: #2E8B57;
+            --primary: #1F6B41;        /* Verde mais escuro */
+            --primary-dark: #164B30;   /* Verde ainda mais escuro */
             --secondary: #2A7BB0;
             --light: #1E1E1E;
             --dark: #F8F9FA;
@@ -42,16 +42,65 @@
             transition: background-color 0.3s, color 0.3s;
         }
 
-        /* Header & Navigation */
-        header {
-            background-color: var(--bg-color);
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            position: fixed;
-            width: 100%;
-            top: 0;
-            z-index: 1000;
-            transition: background-color 0.3s;
-        }
+/* Header & Navigation */
+header {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    position: fixed;
+    width: 100%;
+    top: 0;
+    z-index: 1000;
+    transition: background-color 0.3s;
+}
+
+/* Links de navegação - cor branca para contrastar */
+.nav-links a {
+    text-decoration: none;
+    color: white;  /* ← Mudei para branco */
+    font-weight: 500;
+    transition: color 0.3s;
+}
+
+.nav-links a:hover {
+    color: #e8f5e8;  /* ← Verde bem clarinho no hover */
+}
+
+/* Botão Entrar - cor mais clara */
+.btn-entrar {
+    display: inline-block;
+    padding: 0.5rem 1.5rem;
+    background-color: rgba(255, 255, 255, 0.2);  /* ← Verde com transparência */
+    color: white;
+    text-decoration: none;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-align: center;
+}
+
+.btn-entrar:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+    color: white;
+    text-decoration: none;
+}
+
+/* Botão Configurações - cor mais clara */
+.btn-config {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    padding: 0.5rem 1.5rem;
+    border-radius: 4px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-config:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+}
 
         .nav-container {
             display: flex;
@@ -460,8 +509,7 @@
     <section class="hero">
         <div class="hero-content">
             <h1 data-key="hero.title">TRANSFORMANDO SUSTENTABILIDADE INDUSTRIAL EM RESULTADOS REAIS</h1>
-            <p data-key="hero.description">Tenha controle total do consumo de energia e elimine desperdícios com insights automáticos. Mais
-                eficiência, menos custos, tudo em tempo real.</p>
+            <p data-key="hero.description">Você sabia que pequenas decisões na produção industrial podem fazer uma grande diferença para o meio ambiente? No nosso jogo interativo, você vai enfrentar desafios reais e aprender como tornar processos industriais mais sustentáveis. Clique e veja se consegue equilibrar crescimento e responsabilidade ambiental!</p>
             <button class="btn-saiba-mais" data-key="hero.learnMore">Saiba mais</button>
             
             <div class="sustainability-circles">
@@ -548,7 +596,7 @@
                 "settings.english": "English",
                 "settings.spanish": "Español",
                 "hero.title": "TRANSFORMANDO SUSTENTABILIDADE INDUSTRIAL EM RESULTADOS REAIS",
-                "hero.description": "Tenha controle total do consumo de energia e elimine desperdícios com insights automáticos. Mais eficiência, menos custos, tudo em tempo real.",
+                "hero.description": "Você sabia que pequenas decisões na produção industrial podem fazer uma grande diferença para o meio ambiente? No nosso jogo interativo, você vai enfrentar desafios reais e aprender como tornar processos industriais mais sustentáveis. Clique e veja se consegue equilibrar crescimento e responsabilidade ambiental!",
                 "hero.learnMore": "Saiba mais",
                 "about.title": "QUEM SOMOS",
                 "about.text1": "Somos a Ecotrace, uma plataforma que une tecnologia avançada e sustentabilidade para trazer precisão, transparência e rastreabilidade à gestão ambiental industrial.",
@@ -580,7 +628,7 @@
                 "settings.english": "English",
                 "settings.spanish": "Spanish",
                 "hero.title": "TRANSFORMING INDUSTRIAL SUSTAINABILITY INTO REAL RESULTS",
-                "hero.description": "Take full control of energy consumption and eliminate waste with automated insights. More efficiency, lower costs, all in real time.",
+                "hero.description": "Did you know that small decisions in industrial production can make a big difference for the environment? In our interactive game, you’ll face real-world challenges and learn how to make industrial processes more sustainable. Click and see if you can balance growth with environmental responsibility!",
                 "hero.learnMore": "Learn More",
                 "about.title": "ABOUT US",
                 "about.text1": "We are Ecotrace, a platform that combines advanced technology and sustainability to bring precision, transparency and traceability to industrial environmental management.",
@@ -612,7 +660,7 @@
                 "settings.english": "Inglés",
                 "settings.spanish": "Español",
                 "hero.title": "TRANSFORMANDO LA SOSTENIBILIDAD INDUSTRIAL EN RESULTADOS REALES",
-                "hero.description": "Tenga control total del consumo de energía y elimine desperdicios con información automatizada. Más eficiencia, menos costos, todo en tiempo real.",
+                "hero.description": "¿Sabías que pequeñas decisiones en la producción industrial pueden marcar una gran diferencia para el medio ambiente? En nuestro juego interactivo, enfrentarás desafíos del mundo real y aprenderás cómo hacer los procesos industriales más sostenibles. ¡Haz clic y comprueba si puedes equilibrar el crecimiento con la responsabilidad ambiental!",
                 "hero.learnMore": "Saber Más",
                 "about.title": "QUIÉNES SOMOS",
                 "about.text1": "Somos Ecotrace, una plataforma que une tecnología avanzada y sostenibilidad para aportar precisión, transparencia y trazabilidad a la gestión ambiental industrial.",

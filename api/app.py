@@ -9,23 +9,57 @@ import hashlib
 import secrets
 
 app = Flask(__name__)
-app.secret_key = 'sua_chave_secreta_muito_segura_aqui_ecotrace_2025'  # Altere para uma chave segura
+# Use SECRET_KEY from env when disponível (importante para Vercel/serverless)
+app.secret_key = os.environ.get('SECRET_KEY', 'sua_chave_secreta_muito_segura_aqui_ecotrace_2025')
 CORS(app)
 
-# Configuração do Aiven MySQL (SUBSTITUA COM SUAS CREDENCIAIS)
+# Configuração do Aiven MySQL (ler de variáveis de ambiente, com defaults para desenvolvimento)
 MYSQL_CONFIG = {
-    'host': 'ecotrace-mysql-thailasalvees-1966.k.aivencloud.com',  # Seu host do Aiven
-    'user': 'avnadmin',              # Seu usuário do Aiven
-    'password': 'AVNS_I1zukuXJ_odzJkROzFH', # Sua senha do Aiven
-    'database': 'defaultdb',
-    'port': 21264,                   # Porta do Aiven
-    'connect_timeout': 10,
+    'host': os.environ.get('AIVEN_HOST'),
+    'user': os.environ.get('AIVEN_USER'),
+    'password': os.environ.get('AIVEN_PASSWORD'),
+    'database': os.environ.get('AIVEN_DB'),
+    'port': int(os.environ.get('AIVEN_PORT')),
+    'connect_timeout': int(os.environ.get('AIVEN_TIMEOUT', '10')),
 }
 
-# Função para conectar ao MySQL (sem SSL)
+# Caminho temporário para o certificado CA quando fornecido via env
+_SSL_CA_PATH = None
+
+# Função para conectar ao MySQL (com suporte opcional a SSL CA)
 def get_db_connection():
+    global _SSL_CA_PATH
     try:
-        conn = mysql.connector.connect(**MYSQL_CONFIG)
+        # Construir os parâmetros de conexão dinamicamente
+        conn_params = dict(MYSQL_CONFIG)
+
+        # Suporte a certificado CA vindo de variável de ambiente (AIVEN_SSL_CA).
+        # A variável pode conter o PEM completo ou um conteúdo Base64 do PEM.
+        ssl_ca_env = os.environ.get('AIVEN_SSL_CA') or os.environ.get('MYSQL_SSL_CA')
+        if ssl_ca_env:
+            if _SSL_CA_PATH is None:
+                import tempfile, base64
+                # Detectar se é PEM direto
+                pem_data = ssl_ca_env
+                if '-----BEGIN CERTIFICATE-----' not in pem_data:
+                    try:
+                        # tentar decodificar Base64
+                        pem_data = base64.b64decode(ssl_ca_env).decode('utf-8')
+                    except Exception:
+                        # se falhar, manter como veio (provavelmente inválido)
+                        pem_data = ssl_ca_env
+                # gravar em arquivo temporário persistente para múltiplas chamadas
+                tmp = tempfile.NamedTemporaryFile(delete=False, suffix='.pem')
+                tmp.write(pem_data.encode('utf-8'))
+                tmp.flush()
+                tmp.close()
+                _SSL_CA_PATH = tmp.name
+            # passar ssl_ca para o conector MySQL
+            conn_params['ssl_ca'] = _SSL_CA_PATH
+            # garantir verificação de certificado
+            conn_params['ssl_verify_cert'] = True
+
+        conn = mysql.connector.connect(**conn_params)
         print("✅ Conexão MySQL estabelecida com sucesso!")
         return conn
     except mysql.connector.Error as e:
@@ -436,8 +470,11 @@ def get_user():
     })
 
 if __name__ == "__main__":
-    # Inicializar banco na primeira execução
+    # Inicializar banco na primeira execução local
     print("🔄 Inicializando banco de dados...")
     init_db()
     print("🚀 Servidor Flask iniciando...")
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    # Quando estiver em Vercel (ou outro ambiente serverless) a variável VERCEL estará presente.
+    # Evitar chamar app.run no serverless; o runtime do Vercel importa o `app`.
+    if os.environ.get('VERCEL') is None:
+        app.run(debug=True, host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))

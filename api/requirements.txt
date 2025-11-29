@@ -4,15 +4,13 @@ Werkzeug==2.3.7
 Jinja2==3.1.2
 itsdangerous==2.1.2
 click==8.1.7
- 
-# Database (SQLite já vem com Python)
-# Para MySQL/PostgreSQL futuro:
-# mysql-connector-python==8.1.0
-# psycopg2-binary==2.9.7
- 
+
+# MySQL Connector
+mysql-connector-python==8.1.0
+
 # Para produção (opcional)
 gunicorn==21.2.0
 python-dotenv==1.0.0
- 
+
 # Para desenvolvimento (opcional)
 blinker==1.6.3
