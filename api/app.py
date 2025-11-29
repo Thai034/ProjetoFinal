@@ -18,7 +18,7 @@ app = Flask(
 app.secret_key = os.environ.get('SECRET_KEY', 'sua_chave_secreta_muito_segura_aqui_ecotrace_2025')
 CORS(app)
 
-# Configuração do Aiven MySQL (ler de variáveis de ambiente, com defaults para desenvolvimento)
+# Configuração do Aiven MySQL
 MYSQL_CONFIG = {
     'host': os.environ.get('AIVEN_HOST'),
     'user': os.environ.get('AIVEN_USER'),
@@ -319,13 +319,19 @@ def register():
         senha_hash = hash_password(senha)
         
         # Inserir usuário
-        cursor.execute(
-            'INSERT INTO usuarios (nome, email, senha) VALUES (%s, %s, %s)',
-            (nome, email, senha_hash)
-        )
-        conn.commit()
-        user_id = cursor.lastrowid
-        conn.close()
+        try:
+            cursor.execute(
+                'INSERT INTO usuarios (nome, email, senha) VALUES (%s, %s, %s)',
+                (nome, email, senha_hash)
+            )
+            conn.commit()  # Certificar que as alterações são salvas
+            user_id = cursor.lastrowid
+        except Exception as e:
+            conn.rollback()  # Reverter alterações em caso de erro
+            print(f"Erro ao inserir usuário: {e}")
+            return jsonify({'success': False, 'message': 'Erro ao salvar usuário no banco de dados'}), 500
+        finally:
+            conn.close()  # Garantir que a conexão seja fechada
         
         # Logar usuário automaticamente
         session['user_id'] = user_id
