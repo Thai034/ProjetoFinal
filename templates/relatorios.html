@@ -6,6 +6,42 @@
     <title>Relatórios de Carbono - EcoTrace</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <style>
+        :root {
+            --primary-color: #2e7d32;
+            --primary-light: #4caf50;
+            --primary-dark: #1b5e20;
+            --bg-body: linear-gradient(135deg, #f0f9f0 0%, #e6f4e6 100%);
+            --bg-card: #ffffff;
+            --text-main: #333333;
+            --text-secondary: #666666;
+            --border-color: #e8f5e9;
+            --header-bg: linear-gradient(135deg, #2e7d32, #4caf50);
+            --header-text: #ffffff;
+            --table-header-bg: #f1f8e9;
+            --table-hover: #f9fdf9;
+            --shadow-color: rgba(46, 125, 50, 0.1);
+            --chart-grid: #e0e0e0;
+            --chart-text: #666666;
+        }
+
+        [data-theme="dark"] {
+            --primary-color: #81c784; /* Verde mais claro para contraste */
+            --primary-light: #a5d6a7;
+            --primary-dark: #2e7d32;
+            --bg-body: linear-gradient(135deg, #121212 0%, #1e1e1e 100%);
+            --bg-card: #2d2d2d;
+            --text-main: #e0e0e0;
+            --text-secondary: #b0b0b0;
+            --border-color: #404040;
+            --header-bg: linear-gradient(135deg, #1b5e20, #2e7d32);
+            --header-text: #ffffff;
+            --table-header-bg: #383838;
+            --table-hover: #363636;
+            --shadow-color: rgba(0, 0, 0, 0.5);
+            --chart-grid: #505050;
+            --chart-text: #b0b0b0;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -14,24 +50,27 @@
  
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #f0f9f0 0%, #e6f4e6 100%);
+            background: var(--bg-body);
+            color: var(--text-main);
             min-height: 100vh;
             padding: 20px;
+            transition: background 0.3s, color 0.3s;
         }
  
         .reports-container {
             max-width: 1200px;
             margin: 0 auto;
-            background: white;
+            background: var(--bg-card);
             border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 100, 0, 0.1);
+            box-shadow: 0 10px 30px var(--shadow-color);
             overflow: hidden;
+            transition: background 0.3s;
         }
  
         .reports-header {
-            background: linear-gradient(135deg, #2e7d32, #4caf50);
-            color: white;
-            padding: 30px;
+            background: var(--header-bg);
+            color: var(--header-text);
+            padding: 30px 20px;
             text-align: center;
             position: relative;
         }
@@ -42,9 +81,9 @@
             top: 50%;
             transform: translateY(-50%);
             background: rgba(255, 255, 255, 0.2);
-            border: 2px solid white;
+            border: 2px solid rgba(255,255,255,0.8);
             color: white;
-            padding: 10px 20px;
+            padding: 8px 15px;
             border-radius: 8px;
             cursor: pointer;
             font-weight: 600;
@@ -57,7 +96,7 @@
         }
  
         .reports-header h1 {
-            font-size: 2.5em;
+            font-size: 2em;
             margin-bottom: 10px;
         }
  
@@ -67,13 +106,14 @@
         }
  
         .period-selector {
-            background: #e8f5e9;
+            background: rgba(0,0,0,0.03); /* Neutro para funcionar em dark/light */
             padding: 20px;
-            border-bottom: 1px solid #c8e6c9;
+            border-bottom: 1px solid var(--border-color);
             display: flex;
             justify-content: center;
             align-items: center;
             gap: 15px;
+            color: var(--text-main);
         }
  
         .dropdown {
@@ -83,12 +123,12 @@
  
         .dropdown-btn {
             padding: 12px 20px;
-            background: white;
-            border: 2px solid #2e7d32;
+            background: var(--bg-card);
+            border: 2px solid var(--primary-color);
             border-radius: 8px;
             cursor: pointer;
             font-weight: 600;
-            color: #2e7d32;
+            color: var(--primary-color);
             min-width: 220px;
             text-align: left;
             position: relative;
@@ -106,15 +146,15 @@
         .dropdown-content {
             display: none;
             position: absolute;
-            background: white;
+            background: var(--bg-card);
             min-width: 220px;
-            box-shadow: 0 8px 16px rgba(46, 125, 50, 0.2);
+            box-shadow: 0 8px 16px var(--shadow-color);
             border-radius: 8px;
             z-index: 1000;
             top: 100%;
             left: 0;
             margin-top: 5px;
-            border: 1px solid #c8e6c9;
+            border: 1px solid var(--border-color);
         }
  
         .dropdown-content.show {
@@ -124,12 +164,13 @@
         .dropdown-item {
             padding: 12px 20px;
             cursor: pointer;
-            border-bottom: 1px solid #e8f5e9;
+            border-bottom: 1px solid var(--border-color);
             transition: background 0.3s ease;
+            color: var(--text-main);
         }
  
         .dropdown-item:hover {
-            background: #e8f5e9;
+            background: var(--table-hover);
         }
  
         .dropdown-item:last-child {
@@ -143,12 +184,12 @@
         .loading {
             text-align: center;
             padding: 40px;
-            color: #4caf50;
+            color: var(--primary-color);
         }
 
         .loading-spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #4caf50;
+            border: 4px solid var(--border-color);
+            border-top: 4px solid var(--primary-color);
             border-radius: 50%;
             width: 40px;
             height: 40px;
@@ -169,14 +210,15 @@
         }
  
         .stat-card {
-            background: white;
+            background: var(--bg-card);
             padding: 25px;
             border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(46, 125, 50, 0.1);
-            border-left: 4px solid #4caf50;
+            box-shadow: 0 5px 15px var(--shadow-color);
+            border-left: 4px solid var(--primary-light);
             transition: transform 0.3s ease;
             position: relative;
             overflow: hidden;
+            border: 1px solid var(--border-color);
         }
  
         .stat-card::before {
@@ -185,7 +227,7 @@
             top: 15px;
             right: 15px;
             font-size: 1.5em;
-            opacity: 0.2;
+            opacity: 0.1;
         }
  
         .stat-card:hover {
@@ -193,7 +235,7 @@
         }
  
         .stat-card h3 {
-            color: #2e7d32;
+            color: var(--primary-color);
             font-size: 0.9em;
             text-transform: uppercase;
             letter-spacing: 1px;
@@ -203,39 +245,44 @@
         .stat-value {
             font-size: 2.2em;
             font-weight: bold;
-            color: #1b5e20;
+            color: var(--text-main);
             margin-bottom: 5px;
         }
  
         .stat-unit {
             font-size: 0.6em;
-            color: #4caf50;
+            color: var(--text-secondary);
             font-weight: normal;
         }
  
         .stat-change {
             font-size: 0.9em;
             font-weight: 600;
-            color: #666;
+            color: var(--text-secondary);
         }
  
         .carbon-impact {
-            background: linear-gradient(135deg, #e8f5e9, #f1f8e9);
+            background: linear-gradient(135deg, rgba(46, 125, 50, 0.1), rgba(76, 175, 80, 0.1));
             padding: 20px;
             border-radius: 10px;
             margin-bottom: 20px;
             text-align: center;
+            border: 1px solid var(--border-color);
+        }
+        
+        .carbon-impact h3 {
+            color: var(--text-main);
         }
  
         .impact-value {
             font-size: 1.5em;
             font-weight: bold;
-            color: #2e7d32;
+            color: var(--primary-color);
             margin: 10px 0;
         }
  
         .impact-description {
-            color: #4caf50;
+            color: var(--text-secondary);
             font-size: 0.9em;
         }
 
@@ -247,15 +294,15 @@
         }
 
         .chart-card {
-            background: white;
+            background: var(--bg-card);
             padding: 25px;
             border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(46, 125, 50, 0.1);
-            border: 1px solid #e8f5e9;
+            box-shadow: 0 5px 15px var(--shadow-color);
+            border: 1px solid var(--border-color);
         }
 
         .chart-card h2 {
-            color: #2e7d32;
+            color: var(--primary-color);
             margin-bottom: 20px;
             font-size: 1.3em;
             display: flex;
@@ -269,16 +316,22 @@
         }
  
         .data-table {
-            background: white;
+            background: var(--bg-card);
             border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(46, 125, 50, 0.1);
+            box-shadow: 0 5px 15px var(--shadow-color);
             overflow: hidden;
-            border: 1px solid #e8f5e9;
+            border: 1px solid var(--border-color);
             margin-top: 30px;
+        }
+        
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
         }
  
         .table-header {
-            background: linear-gradient(135deg, #4caf50, #66bb6a);
+            background: var(--primary-color);
             color: white;
             padding: 20px;
         }
@@ -293,22 +346,25 @@
         table {
             width: 100%;
             border-collapse: collapse;
+            min-width: 600px;
         }
  
         th, td {
             padding: 15px 20px;
             text-align: left;
-            border-bottom: 1px solid #e8f5e9;
+            border-bottom: 1px solid var(--border-color);
+            white-space: nowrap;
+            color: var(--text-main);
         }
  
         th {
-            background: #f1f8e9;
+            background: var(--table-header-bg);
             font-weight: 600;
-            color: #2e7d32;
+            color: var(--primary-color);
         }
  
         tr:hover {
-            background: #f9fdf9;
+            background: var(--table-hover);
         }
  
         .category-badge {
@@ -318,36 +374,25 @@
             font-weight: 600;
             display: inline-block;
         }
- 
-        .badge-energy {
-            background: #fff3e0;
-            color: #ef6c00;
-        }
- 
-        .badge-transport {
-            background: #e3f2fd;
-            color: #1976d2;
-        }
- 
-        .badge-materials {
-            background: #f3e5f5;
-            color: #7b1fa2;
-        }
- 
-        .badge-waste {
-            background: #e0f2f1;
-            color: #00695c;
-        }
-
-        .badge-water {
-            background: #e1f5fe;
-            color: #0277bd;
-        }
+        
+        /* Badges mantêm cores fixas para identificação, ou ajustam levemente */
+        .badge-energy { background: #fff3e0; color: #ef6c00; }
+        .badge-transport { background: #e3f2fd; color: #1976d2; }
+        .badge-materials { background: #f3e5f5; color: #7b1fa2; }
+        .badge-waste { background: #e0f2f1; color: #00695c; }
+        .badge-water { background: #e1f5fe; color: #0277bd; }
+        
+        /* Ajuste de badges para modo escuro */
+        [data-theme="dark"] .badge-energy { background: #4a2c00; color: #ffb74d; }
+        [data-theme="dark"] .badge-transport { background: #0d47a1; color: #90caf9; }
+        [data-theme="dark"] .badge-materials { background: #4a148c; color: #ce93d8; }
+        [data-theme="dark"] .badge-waste { background: #004d40; color: #80cbc4; }
+        [data-theme="dark"] .badge-water { background: #01579b; color: #81d4fa; }
  
         .no-data {
             text-align: center;
             padding: 60px 40px;
-            color: #78909c;
+            color: var(--text-secondary);
             font-style: italic;
         }
  
@@ -360,13 +405,13 @@
         .export-options {
             text-align: center;
             padding: 30px;
-            background: #f1f8e9;
-            border-top: 1px solid #c8e6c9;
+            background: rgba(0,0,0,0.03);
+            border-top: 1px solid var(--border-color);
         }
  
         .export-btn {
             padding: 15px 30px;
-            background: #4caf50;
+            background: var(--primary-color);
             color: white;
             border: none;
             border-radius: 25px;
@@ -381,11 +426,11 @@
         }
  
         .export-btn:hover {
-            background: #43a047;
+            opacity: 0.9;
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
+            box-shadow: 0 5px 15px var(--shadow-color);
         }
- 
+        
         @media (max-width: 1024px) {
             .charts-container {
                 grid-template-columns: 1fr;
@@ -998,25 +1043,25 @@
 <body>
     <div class="reports-container">
         <div class="reports-header">
-            <a href="/onepage" class="back-btn">← Voltar</a>
-            <h1>📊 Relatórios de Carbono</h1>
-            <p>Monitoramento e análise das suas emissões de carbono</p>
+            <a href="/onepage" class="back-btn" id="btn-back">← Voltar</a>
+            <h1 id="page-title">📊 Relatórios de Carbono</h1>
+            <p id="page-subtitle">Monitoramento e análise das suas emissões de carbono</p>
         </div>
  
         <div class="period-selector">
-            <span>Período de análise:</span>
+            <span id="period-label">Período de análise:</span>
             <div class="dropdown">
                 <button class="dropdown-btn" id="periodDropdown">
-                    Último Mês
+                    <span id="current-period-text">Último Mês</span>
                 </button>
                 <div class="dropdown-content" id="dropdownContent">
-                    <div class="dropdown-item" data-period="1">Último Dia</div>
-                    <div class="dropdown-item" data-period="7">Última Semana</div>
-                    <div class="dropdown-item" data-period="30">Último Mês</div>
-                    <div class="dropdown-item" data-period="90">Último Trimestre</div>
-                    <div class="dropdown-item" data-period="180">Último Semestre</div>
-                    <div class="dropdown-item" data-period="365">Último Ano</div>
-                    <div class="dropdown-item" data-period="all">Todos os Registros</div>
+                    <div class="dropdown-item" data-period="1" data-i18n="periodDay">Último Dia</div>
+                    <div class="dropdown-item" data-period="7" data-i18n="periodWeek">Última Semana</div>
+                    <div class="dropdown-item" data-period="30" data-i18n="periodMonth">Último Mês</div>
+                    <div class="dropdown-item" data-period="90" data-i18n="periodQuarter">Último Trimestre</div>
+                    <div class="dropdown-item" data-period="180" data-i18n="periodSemester">Último Semestre</div>
+                    <div class="dropdown-item" data-period="365" data-i18n="periodYear">Último Ano</div>
+                    <div class="dropdown-item" data-period="all" data-i18n="periodAll">Todos os Registros</div>
                 </div>
             </div>
         </div>
@@ -1024,21 +1069,195 @@
         <div class="reports-content" id="reportsContent">
             <div class="loading">
                 <div class="loading-spinner"></div>
-                <p>Carregando dados de emissões...</p>
+                <p id="loading-text">Carregando dados de emissões...</p>
             </div>
         </div>
     </div>
  
     <script>
+        const translations = {
+            pt: {
+                back: "← Voltar",
+                title: "📊 Relatórios de Carbono",
+                subtitle: "Monitoramento e análise das suas emissões de carbono",
+                periodLabel: "Período de análise:",
+                loading: "Carregando dados de emissões...",
+                errorTitle: "Erro ao carregar dados",
+                errorDesc: "Não foi possível carregar os dados. Tente novamente.",
+                noDataTitle: "Nenhum dado encontrado",
+                noDataDesc: "Os registros de carbono aparecerão aqui conforme você adiciona atividades.",
+                impactTitle: "🌍 Impacto Ambiental Equivalente",
+                impactTrees: "árvores necessárias para compensar",
+                impactDesc: "Equivalente a",
+                statTotal: "Emissões Totais de CO₂",
+                statRegistros: "registros no período",
+                statAvg: "Média Diária",
+                statUnitDay: "kg/dia",
+                statBase: "Baseado no período selecionado",
+                statSource: "Maior Fonte",
+                statSourceDesc: "Categoria com mais emissões",
+                statReduction: "Redução Necessária",
+                statMeta: "Para meta sustentável (2kg/dia)",
+                chartTimeline: "📈 Evolução das Emissões",
+                chartDist: "🥧 Distribuição por Categoria",
+                tableTitle: "📋 Registros Detalhados",
+                exportBtn: "📊 Exportar para CSV",
+                colDate: "Data",
+                colCat: "Categoria",
+                colSub: "Subcategoria",
+                colQtd: "Quantidade",
+                colScope: "Escopo",
+                colEmission: "Emissões",
+                // Periodos
+                periodDay: "Último Dia",
+                periodWeek: "Última Semana",
+                periodMonth: "Último Mês",
+                periodQuarter: "Último Trimestre",
+                periodSemester: "Último Semestre",
+                periodYear: "Último Ano",
+                periodAll: "Todos os Registros",
+                // Categorias e Escopos
+                cat_energy: "Energia",
+                cat_transport: "Transporte",
+                cat_materials: "Materiais",
+                cat_waste: "Resíduos",
+                cat_water: "Água",
+                scope_direct: "Direto (Escopo 1)",
+                scope_indirect: "Indireto (Escopo 2)",
+                scope_other: "Outro (Escopo 3)",
+                others: "Outros"
+            },
+            en: {
+                back: "← Back",
+                title: "📊 Carbon Reports",
+                subtitle: "Monitoring and analysis of your carbon emissions",
+                periodLabel: "Analysis period:",
+                loading: "Loading emissions data...",
+                errorTitle: "Error loading data",
+                errorDesc: "Could not load data. Please try again.",
+                noDataTitle: "No data found",
+                noDataDesc: "Carbon records will appear here as you add activities.",
+                impactTitle: "🌍 Equivalent Environmental Impact",
+                impactTrees: "trees needed to offset",
+                impactDesc: "Equivalent to",
+                statTotal: "Total CO₂ Emissions",
+                statRegistros: "records in period",
+                statAvg: "Daily Average",
+                statUnitDay: "kg/day",
+                statBase: "Based on selected period",
+                statSource: "Largest Source",
+                statSourceDesc: "Category with most emissions",
+                statReduction: "Reduction Needed",
+                statMeta: "For sustainable goal (2kg/day)",
+                chartTimeline: "📈 Emissions Evolution",
+                chartDist: "🥧 Category Distribution",
+                tableTitle: "📋 Detailed Records",
+                exportBtn: "📊 Export to CSV",
+                colDate: "Date",
+                colCat: "Category",
+                colSub: "Subcategory",
+                colQtd: "Quantity",
+                colScope: "Scope",
+                colEmission: "Emissions",
+                // Periods
+                periodDay: "Last Day",
+                periodWeek: "Last Week",
+                periodMonth: "Last Month",
+                periodQuarter: "Last Quarter",
+                periodSemester: "Last Semester",
+                periodYear: "Last Year",
+                periodAll: "All Records",
+                // Categories
+                cat_energy: "Energy",
+                cat_transport: "Transport",
+                cat_materials: "Materials",
+                cat_waste: "Waste",
+                cat_water: "Water",
+                scope_direct: "Direct (Scope 1)",
+                scope_indirect: "Indirect (Scope 2)",
+                scope_other: "Other (Scope 3)",
+                others: "Others"
+            },
+            es: {
+                back: "← Volver",
+                title: "📊 Informes de Carbono",
+                subtitle: "Monitoreo y análisis de sus emisiones de carbono",
+                periodLabel: "Período de análisis:",
+                loading: "Cargando datos de emisiones...",
+                errorTitle: "Error al cargar datos",
+                errorDesc: "No se pudieron cargar los datos. Intente nuevamente.",
+                noDataTitle: "No se encontraron datos",
+                noDataDesc: "Los registros de carbono aparecerán aquí a medida que agregue actividades.",
+                impactTitle: "🌍 Impacto Ambiental Equivalente",
+                impactTrees: "árboles necesarios para compensar",
+                impactDesc: "Equivalente a",
+                statTotal: "Emisiones Totales de CO₂",
+                statRegistros: "registros en el período",
+                statAvg: "Promedio Diario",
+                statUnitDay: "kg/día",
+                statBase: "Basado en el período seleccionado",
+                statSource: "Mayor Fuente",
+                statSourceDesc: "Categoría con más emisiones",
+                statReduction: "Reducción Necesaria",
+                statMeta: "Para meta sostenible (2kg/día)",
+                chartTimeline: "📈 Evolución de Emisiones",
+                chartDist: "🥧 Distribución por Categoría",
+                tableTitle: "📋 Registros Detallados",
+                exportBtn: "📊 Exportar a CSV",
+                colDate: "Fecha",
+                colCat: "Categoría",
+                colSub: "Subcategoría",
+                colQtd: "Cantidad",
+                colScope: "Alcance",
+                colEmission: "Emisiones",
+                // Periods
+                periodDay: "Último Día",
+                periodWeek: "Última Semana",
+                periodMonth: "Último Mes",
+                periodQuarter: "Último Trimestre",
+                periodSemester: "Último Semestre",
+                periodYear: "Último Año",
+                periodAll: "Todos los Registros",
+                // Categories
+                cat_energy: "Energía",
+                cat_transport: "Transporte",
+                cat_materials: "Materiales",
+                cat_waste: "Residuos",
+                cat_water: "Agua",
+                scope_direct: "Directo (Alcance 1)",
+                scope_indirect: "Indirecto (Alcance 2)",
+                scope_other: "Otro (Alcance 3)",
+                others: "Otros"
+            }
+        };
+
         let currentPeriod = 30;
         let allEmissions = [];
         let timelineChart = null;
         let distributionChart = null;
 
+        function loadPreferences() {
+            // Tema
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+
+            // Idioma
+            const savedLang = localStorage.getItem('language') || 'pt';
+            const t = translations[savedLang];
+
+            // Aplicar textos
+            if (document.getElementById('btn-back')) document.getElementById('btn-back').innerText = t.back;
+            if (document.getElementById('title-text')) document.getElementById('title-text').innerText = t.title;
+            if (document.getElementById('subtitle-text')) document.getElementById('subtitle-text').innerText = t.subtitle;
+            if (document.getElementById('period-label')) document.getElementById('period-label').innerText = t.periodLabel;
+            if (document.getElementById('loading-text')) document.getElementById('loading-text').innerText = t.loading;
+        }
+
         // Inicialização
         document.addEventListener('DOMContentLoaded', function() {
             initializeDropdown();
             loadEmissionsData();
+            loadPreferences();
         });
 
         // Controle do dropdown
@@ -1387,41 +1606,40 @@
                         mode: 'index',
                         intersect: false,
                     },
+                    scales: {
+                        x: {
+                            ticks: { color: getComputedStyle(document.body).getPropertyValue('--chart-text') },
+                            grid: { color: getComputedStyle(document.body).getPropertyValue('--chart-grid') }
+                        },
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            ticks: { color: getComputedStyle(document.body).getPropertyValue('--chart-text') },
+                            grid: { color: getComputedStyle(document.body).getPropertyValue('--chart-grid') }
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            grid: { drawOnChartArea: false }, // Remove grade do eixo secundário para não poluir
+                            ticks: { color: getComputedStyle(document.body).getPropertyValue('--chart-text') }
+                        }
+                    },
                     plugins: {
                         legend: {
                             display: true,
                             position: 'top',
+                            labels: {
+                                // Aqui aplica a cor do tema
+                                color: getComputedStyle(document.body).getPropertyValue('--chart-text')
+                            }
                         },
                         tooltip: {
                             callbacks: {
                                 label: function(context) {
                                     return context.dataset.label + ': ' + context.parsed.y.toFixed(2) + ' kg CO₂e';
                                 }
-                            }
-                        }
-                    },
-                    scales: {
-                        y: {
-                            type: 'linear',
-                            display: true,
-                            position: 'left',
-                            title: {
-                                display: true,
-                                text: 'Emissões Diárias (kg CO₂e)'
-                            },
-                            beginAtZero: true
-                        },
-                        y1: {
-                            type: 'linear',
-                            display: true,
-                            position: 'right',
-                            title: {
-                                display: true,
-                                text: 'Acumulado (kg CO₂e)'
-                            },
-                            beginAtZero: true,
-                            grid: {
-                                drawOnChartArea: false,
                             }
                         }
                     }
@@ -1463,6 +1681,8 @@
             const backgroundColors = categories.map(cat => colors[cat] || '#757575');
             const borderColors = backgroundColors.map(color => color);
 
+            const cardColor = getComputedStyle(document.body).getPropertyValue('--bg-card').trim();
+
             distributionChart = new Chart(ctx, {
                 type: 'doughnut',
                 data: {
@@ -1470,7 +1690,8 @@
                     datasets: [{
                         data: emissions,
                         backgroundColor: backgroundColors,
-                        borderColor: borderColors,
+                        // A borda muda dinamicamente (branco no claro, cinza escuro no escuro)
+                        borderColor: cardColor, 
                         borderWidth: 2
                     }]
                 },
@@ -1481,6 +1702,10 @@
                         legend: {
                             display: true,
                             position: 'bottom',
+                            labels: {
+                                // Aplica a cor do texto do tema na legenda
+                                color: getComputedStyle(document.body).getPropertyValue('--chart-text')
+                            }
                         },
                         tooltip: {
                             callbacks: {
