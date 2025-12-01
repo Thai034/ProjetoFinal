@@ -14,42 +14,43 @@
         }
 
         :root {
-            --primary: #2E8B57;
-            --primary-dark: #1F6B41;
-            --secondary: #1A5276;
-            --light: #F8F9FA;
-            --dark: #343A40;
-            --gray: #6C757D;
-            --bg-color: #ffffff;
-            --text-color: #343A40;
-            --header-bg: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            --footer-bg: linear-gradient(135deg, var(--primary-dark), #003300);
+            --primary-color: #2e7d32;
+            --primary-light: #60ad5e;
+            --primary-dark: #005005;
+            --secondary-color: #ff8f00;
+            --background-color: #f5f5f5;
+            --card-color: #ffffff;
+            --text-color: #333333;
+            --text-light: #757575;
+            --border-color: #e0e0e0;
+            --chart-text-color: #333333;
         }
 
         [data-theme="dark"] {
-            --primary: #1F6B41;
-            --primary-dark: #164B30;
-            --secondary: #2A7BB0;
-            --light: #1E1E1E;
-            --dark: #F8F9FA;
-            --gray: #A0A0A0;
-            --bg-color: #121212;
-            --text-color: #F8F9FA;
-            --header-bg: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            --footer-bg: linear-gradient(135deg, var(--primary-dark), #003300);
+            --primary-color: #4CAF50;
+            --primary-light: #81C784;
+            --primary-dark: #388E3C;
+            --secondary-color: #FFA000;
+            --background-color: #1a1a1a;
+            --card-color: #2d2d2d;
+            --text-color: #ffffff;
+            --text-light: #b0b0b0;
+            --border-color: #404040;
+            --chart-text-color: #ffffff;
         }
 
         body {
             color: var(--text-color);
             line-height: 1.6;
-            background-color: var(--bg-color);
+            background-color: var(--background-color);
             transition: background-color 0.3s, color 0.3s;
-            padding-top: 80px; /* Espaço para o header fixo no desktop */
+            padding-top: 80px;
         }
 
-        /* Header & Navigation */
+        /* Header - IDÊNTICO ao onepage.html */
         header {
-            background: var(--header-bg);
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             position: fixed;
             width: 100%;
@@ -62,13 +63,12 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            min-height: 5rem; /* Altura mínima, não fixa */
+            min-height: 5rem;
             padding: 0.5rem 5%;
             max-width: 1200px;
             margin: 0 auto;
         }
 
-        /* Logo ajustada sem margens negativas perigosas */
         .logo {
             display: flex;
             align-items: center;
@@ -102,14 +102,12 @@
             color: #e8f5e8;
         }
 
-        /* Container para botões de ação */
         .nav-actions {
             display: flex;
             align-items: center;
             gap: 1rem;
         }
 
-        /* Botões */
         .btn-entrar {
             display: inline-block;
             padding: 0.5rem 1.5rem;
@@ -146,7 +144,7 @@
             background-color: rgba(255, 255, 255, 0.3);
         }
 
-        /* Configurações Dropdown */
+        /* Configurações Dropdown - com cores do tema */
         .config-container {
             position: relative;
             display: inline-block;
@@ -158,20 +156,19 @@
             right: 0;
             top: 100%;
             margin-top: 5px;
-            background-color: var(--bg-color);
+            background-color: var(--card-color);
             min-width: 200px;
             box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
             border-radius: 4px;
             z-index: 1001;
             padding: 1rem;
-            border: 1px solid var(--gray);
+            border: 1px solid var(--border-color);
         }
 
         .config-container:hover .config-dropdown {
             display: block;
         }
 
-        /* Conteúdo do Dropdown */
         .theme-toggle h4, .language-selector h4 {
             margin-bottom: 0.5rem;
             color: var(--text-color);
@@ -190,8 +187,8 @@
 
         .theme-btn, .lang-btn {
             padding: 0.5rem;
-            border: 1px solid var(--gray);
-            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            background: var(--card-color);
             color: var(--text-color);
             border-radius: 4px;
             cursor: pointer;
@@ -201,9 +198,9 @@
         }
 
         .theme-btn.active, .lang-btn.active {
-            background-color: var(--primary);
+            background-color: var(--primary-color);
             color: white;
-            border-color: var(--primary);
+            border-color: var(--primary-color);
         }
 
         /* Hero Section */
@@ -223,28 +220,28 @@
 
         .hero-content {
             width: 100%;
-            max-width: 800px; /* Largura controlada */
-            background-color: var(--bg-color);
+            max-width: 800px;
+            background-color: var(--card-color);
             padding: 3rem;
             border-radius: 12px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
         }
 
         .hero h1 {
-            font-size: clamp(1.8rem, 4vw, 2.5rem); /* Texto responsivo */
+            font-size: clamp(1.8rem, 4vw, 2.5rem);
             margin-bottom: 1.5rem;
-            color: var(--secondary);
+            color: var(--primary-dark);
             line-height: 1.2;
         }
 
         .hero p {
             font-size: 1.1rem;
             margin-bottom: 2rem;
-            color: var(--gray);
+            color: var(--text-light);
         }
 
         .btn-saiba-mais {
-            background-color: var(--secondary);
+            background-color: var(--secondary-color);
             color: white;
             border: none;
             padding: 1rem 2.5rem;
@@ -256,7 +253,7 @@
         }
 
         .btn-saiba-mais:hover {
-            background-color: #144265;
+            background-color: #e65100;
             transform: translateY(-3px);
         }
 
@@ -273,33 +270,29 @@
             width: 80px;
             height: 80px;
             border-radius: 50%;
-            background-color: var(--light);
+            background-color: var(--card-color);
             display: flex;
             align-items: center;
             justify-content: center;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             transition: all 0.3s ease;
             cursor: pointer;
-            border: 2px solid var(--primary);
+            border: 2px solid var(--primary-color);
         }
 
         .circle-item:hover {
             transform: translateY(-10px) scale(1.1);
-            background-color: var(--primary);
+            background-color: var(--primary-color);
         }
 
         .circle-item i {
             font-size: 2rem;
-            color: var(--primary);
+            color: var(--primary-color);
             transition: color 0.3s;
         }
 
         .circle-item:hover i {
             color: white;
-        }
-
-        [data-theme="dark"] .circle-item {
-            background-color: #2d2d2d;
         }
 
         /* Sections */
@@ -312,7 +305,7 @@
         section h2 {
             font-size: 2rem;
             margin-bottom: 3rem;
-            color: var(--secondary);
+            color: var(--primary-dark);
             text-align: center;
             position: relative;
         }
@@ -322,7 +315,7 @@
             display: block;
             width: 60px;
             height: 4px;
-            background: var(--primary);
+            background: var(--primary-color);
             margin: 10px auto 0;
             border-radius: 2px;
         }
@@ -337,7 +330,7 @@
             content: '';
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.5); /* Máscara escura para legibilidade */
+            background: rgba(0,0,0,0.5);
         }
 
         .quem-content {
@@ -368,7 +361,7 @@
 
         /* O Que Oferecemos */
         #o-que-oferecemos {
-            background-color: var(--light);
+            background-color: var(--background-color);
         }
 
         .servicos-grid {
@@ -378,12 +371,12 @@
         }
 
         .servico-item {
-            background-color: var(--bg-color);
+            background-color: var(--card-color);
             padding: 2rem;
             border-radius: 12px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
             transition: transform 0.3s, box-shadow 0.3s;
-            border-top: 4px solid var(--primary);
+            border-top: 4px solid var(--primary-color);
         }
 
         .servico-item:hover {
@@ -392,28 +385,50 @@
         }
 
         .servico-item h3 {
-            color: var(--primary);
+            color: var(--primary-color);
             margin-bottom: 1rem;
             font-size: 1.2rem;
         }
 
-        /* Footer */
+        /* Footer - IDÊNTICO ao onepage.html */
         footer {
-            background: var(--footer-bg);
+            background: linear-gradient(135deg, var(--primary-dark), #003300);
             color: white;
             text-align: center;
             padding: 2rem;
             margin-top: auto;
         }
 
-        /* RESPONSIVIDADE (MOBILE) - A CORREÇÃO PRINCIPAL */
+        /* Instagram Icon */
+        .instagram-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .instagram-icon {
+            fill: white;
+            transition: fill 0.3s ease;
+            margin-top: 3px;
+        }
+
+        .instagram-link:hover .instagram-icon {
+            fill: var(--secondary-color);
+        }
+
+        .instagram-link:hover {
+            transform: scale(1.05);
+        }
+
+        /* RESPONSIVIDADE MOBILE */
         @media (max-width: 900px) {
             body {
-                padding-top: 0; /* Header não é fixo ou o layout muda */
+                padding-top: 0;
             }
 
             header {
-                position: relative; /* Deixa o header fluir com a página no mobile */
+                position: relative;
             }
 
             .nav-container {
@@ -446,7 +461,7 @@
             }
 
             .config-container, .btn-entrar {
-                width: 100%; /* Botões ocupam toda largura */
+                width: 100%;
             }
 
             .btn-entrar, .btn-config {
@@ -456,15 +471,14 @@
             }
 
             .config-dropdown {
-                position: static; /* Dropdown empurra o conteúdo */
+                position: static;
                 width: 100%;
                 box-shadow: none;
                 border: 1px solid rgba(255,255,255,0.1);
                 background: rgba(0,0,0,0.05);
-                display: none; /* Mantém escondido até hover/click */
+                display: none;
             }
             
-            /* Ajuste Hero Mobile */
             .hero {
                 padding: 2rem 5%;
             }
@@ -485,27 +499,6 @@
             .circle-item i {
                 font-size: 1.5rem;
             }
-        }
-
-        .instagram-link {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-        }
-
-        .instagram-icon {
-            fill: white; /* Cor branca padrão */
-            transition: fill 0.3s ease;
-            margin-top: 3px;
-        }
-
-        .instagram-link:hover .instagram-icon {
-            fill: #FF6B35;
-        }
-
-        .instagram-link:hover {
-            transform: scale(1.05);
         }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -603,14 +596,14 @@
         </div>
     </section>
 
-<footer>
-    <p data-key="footer.copyright">&copy; 2025 Ecotrace. Todos os direitos reservados.</p>
-    <a href="https://www.instagram.com/grupoecotrace?igsh=d2Qydmh0ZWIyNDR3" target="_blank" class="instagram-link" aria-label="Siga-nos no Instagram">
-        <svg width="24" height="24" viewBox="0 0 24 24" class="instagram-icon">
-            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
-        </svg>
-    </a>
-</footer>
+    <footer>
+        <p data-key="footer.copyright">&copy; 2025 Ecotrace. Todos os direitos reservados.</p>
+        <a href="https://www.instagram.com/grupoecotrace?igsh=d2Qydmh0ZWIyNDR3" target="_blank" class="instagram-link" aria-label="Siga-nos no Instagram">
+            <svg width="24" height="24" viewBox="0 0 24 24" class="instagram-icon">
+                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+            </svg>
+        </a>
+    </footer>
 
     <script>
         // Dicionário de traduções
@@ -702,7 +695,7 @@
                 "services.item1.title": "Cumplimiento Ambiental Automatizado",
                 "services.item1.description": "Garantice el cumplimiento de las regulaciones ambientales de forma automatizada y sin complicaciones.",
                 "services.item2.title": "Monitoreo Energético en Tiempo Real",
-                "services.item2.description": "Realice un seguimiento del consumo de energía en tiempo real e identifique oportunidades de optimización.",
+                "services.item2.description": "Realice un seguimiento del consumo de energia en tiempo real e identifique oportunidades de optimización.",
                 "services.item3.title": "Paneles ESG Confiables y Transparentes",
                 "services.item3.description": "Informes ESG precisos para demostrar su compromiso con la sostenibilidad.",
                 "services.item4.title": "Datos Claros para Decisiones Estratégicas",
@@ -729,49 +722,65 @@
             });
         });
 
-        // Tema claro/escuro - Aplicar no elemento html, não apenas no body
-        const themeButtons = document.querySelectorAll('.theme-btn');
-        themeButtons.forEach(button => {
-            button.addEventListener('click', function() {
-                const theme = this.getAttribute('data-theme');
-                // Aplicar o tema no elemento html (como no onepage.html)
-                document.documentElement.setAttribute('data-theme', theme);
-                localStorage.setItem('theme', theme);
-                
-                themeButtons.forEach(btn => btn.classList.remove('active'));
-                this.classList.add('active');
-                
-                // Trocar a logo conforme o tema
-                const logoImage = document.getElementById('logo-image');
-                if (theme === 'dark') {
-                    logoImage.src = "../static/imagens/logo-clara-horizontal.png";
+        // TEMA - IDÊNTICO ao onepage.html
+        function initializeTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            setTheme(savedTheme);
+        }
+
+        function setTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
+            updateThemeButton(theme);
+        }
+
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            setTheme(newTheme);
+        }
+
+        function updateThemeButton(theme) {
+            const themeButtons = document.querySelectorAll('.theme-btn');
+            themeButtons.forEach(btn => {
+                if (btn.getAttribute('data-theme') === theme) {
+                    btn.classList.add('active');
+                    
+                    // Trocar a logo conforme o tema
+                    const logoImage = document.getElementById('logo-image');
+                    if (theme === 'dark') {
+                        logoImage.src = "../static/imagens/logo-clara-horizontal.png";
+                    } else {
+                        logoImage.src = "../static/imagens/logo-horizontal.png";
+                    }
                 } else {
-                    logoImage.src = "../static/imagens/logo-horizontal.png";
+                    btn.classList.remove('active');
                 }
             });
-        });
+        }
 
-        // Carregar tema salvo
-        const savedTheme = localStorage.getItem('theme') || 'light';
-        document.documentElement.setAttribute('data-theme', savedTheme);
-        themeButtons.forEach(btn => {
-            if (btn.getAttribute('data-theme') === savedTheme) btn.classList.add('active');
-            else btn.classList.remove('active');
-        });
-        const initialLogo = document.getElementById('logo-image');
-        if (savedTheme === 'dark') initialLogo.src = "../static/imagens/logo-clara-horizontal.png";
-
-        // Idioma
+        // IDIOMA
         const langButtons = document.querySelectorAll('.lang-btn');
         langButtons.forEach(button => {
             button.addEventListener('click', function() {
                 const lang = this.getAttribute('data-lang');
-                langButtons.forEach(btn => btn.classList.remove('active'));
-                this.classList.add('active');
-                translateContent(lang);
-                localStorage.setItem('language', lang);
+                setLanguage(lang);
             });
         });
+
+        function setLanguage(language) {
+            document.documentElement.setAttribute('lang', language);
+            localStorage.setItem('language', language);
+            updateLanguageButton(language);
+            translateContent(language);
+        }
+
+        function updateLanguageButton(language) {
+            langButtons.forEach(btn => {
+                if (btn.getAttribute('data-lang') === language) btn.classList.add('active');
+                else btn.classList.remove('active');
+            });
+        }
 
         function translateContent(lang) {
             const elements = document.querySelectorAll('[data-key]');
@@ -787,14 +796,24 @@
             });
         }
 
-        const savedLang = localStorage.getItem('language') || 'pt';
-        langButtons.forEach(btn => {
-            if (btn.getAttribute('data-lang') === savedLang) btn.classList.add('active');
-            else btn.classList.remove('active');
-        });
-        translateContent(savedLang);
-
+        // Inicializar
         document.addEventListener('DOMContentLoaded', function() {
+            // Carregar tema salvo
+            initializeTheme();
+            
+            // Carregar idioma salvo
+            const savedLang = localStorage.getItem('language') || 'pt';
+            setLanguage(savedLang);
+            
+            // Configurar botões de tema
+            document.querySelectorAll('.theme-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const theme = this.getAttribute('data-theme');
+                    setTheme(theme);
+                });
+            });
+            
+            // Botão Entrar
             const entrarBtn = document.querySelector('.btn-entrar');
             if (entrarBtn) {
                 entrarBtn.addEventListener('click', function(e) {
@@ -807,7 +826,6 @@
             
             // Suporte para mobile touch no dropdown
             const configBtn = document.querySelector('.btn-config');
-            
             if(window.innerWidth <= 900) {
                 configBtn.addEventListener('click', function(e) {
                     e.preventDefault();
@@ -819,6 +837,14 @@
                         dropdown.style.display = 'block';
                     }
                 });
+            }
+        });
+
+        // Fechar dropdown ao clicar fora
+        document.addEventListener('click', function(event) {
+            const configContainer = document.querySelector('.config-container');
+            if (!configContainer.contains(event.target)) {
+                document.querySelector('.config-dropdown').style.display = 'none';
             }
         });
     </script>
